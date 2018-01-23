@@ -4,6 +4,10 @@ using Sitecore.XConnect.Client;
 
 namespace Sitecore.TechnicalMarketing.xConnectTutorial
 {
+	/// <summary>
+	/// This Program and related classes is largely inspired and based off of the work of Martina Wehlander in the Sitecore xConnect Tutorials:
+	/// <see cref="https://doc.sitecore.net/developers/xp/getting-started/#tutorials-xconnect"/>
+	/// </summary>
 	public class Program
 	{
 		/// <summary>
