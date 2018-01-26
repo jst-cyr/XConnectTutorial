@@ -43,7 +43,7 @@ namespace Sitecore.TechnicalMarketing.xConnectTutorial
 					//Add to the client
 					client.AddContact(knownContact);
 
-					// Submit contact and interaction - a total of two operations
+					// Submit contact
 					await client.SubmitAsync();
 
 					// Get the last batch that was executed
@@ -68,6 +68,20 @@ namespace Sitecore.TechnicalMarketing.xConnectTutorial
 		/// <returns>The matching contact object</returns>
 		public static async Task<Contact> GetContact(XConnectClientConfiguration cfg, string twitterId, OutputHandler outputHandler)
 		{
+			return await GetContactWithInteractions(cfg, twitterId, null, null, outputHandler);
+		}
+
+		/// <summary>
+		/// Retrieve a created contact with interactions within the range provided
+		/// </summary>
+		/// <param name="cfg">The client configuration for connecting</param>
+		/// <param name="twitterId">The identifier of the contact to create</param>
+		/// <param name="interactionStartTime">The start range of interactions to return</param>
+		/// <param name="interactionEndTime">The end range of interactions to return</param>
+		/// <param name="outputHandler">The object handling output</param>
+		/// <returns>The matching contact object</returns>
+		public static async Task<Contact> GetContactWithInteractions(XConnectClientConfiguration cfg, string twitterId, DateTime? interactionStartTime, DateTime? interactionEndTime, OutputHandler outputHandler)
+		{
 			Contact existingContact = null;
 
 			outputHandler.WriteLine("Retrieving Contact with Identifier:" + twitterId);
@@ -77,23 +91,48 @@ namespace Sitecore.TechnicalMarketing.xConnectTutorial
 			{
 				try
 				{
-					// Get a known contact
+					//Build up options for the query
 					IdentifiedContactReference reference = new IdentifiedContactReference("twitter", twitterId);
-					existingContact = await client.GetAsync<Contact>(reference, new ContactExpandOptions(new string[] { PersonalInformation.DefaultFacetKey }));
+					var contactOptions = new ContactExpandOptions(new string[] { PersonalInformation.DefaultFacetKey });
+
+					//Add interaction range if necessary
+					if(interactionStartTime.HasValue || interactionEndTime.HasValue)
+					{
+						contactOptions.Interactions = new RelatedInteractionsExpandOptions(IpInfo.DefaultFacetKey)
+						{
+							StartDateTime = interactionStartTime,
+							EndDateTime = interactionEndTime
+						};
+					}
+
+					// Get a known contact
+					existingContact = await client.GetAsync<Contact>(reference, contactOptions);
 					if (existingContact == null)
 					{
 						outputHandler.WriteLine("No contact found with ID '{0}'", twitterId);
 						return null;
 					}
-					outputHandler.WriteLine("Contact ID: " + existingContact.Id.ToString());
 
-					//Get the contact name
+					//Output information about the contact
+					outputHandler.WriteLine("Contact ID: " + existingContact.Id.ToString());
+					
 					PersonalInformation existingContactFacet = existingContact.GetFacet<PersonalInformation>(PersonalInformation.DefaultFacetKey);
 					if (existingContactFacet != null)
 					{
 						outputHandler.WriteLine("Contact Name: {0} {1}", existingContactFacet.FirstName, existingContactFacet.LastName);
 						outputHandler.WriteLine("Contact Job Title: {0}", existingContactFacet.JobTitle);
 						outputHandler.WriteLine("Contact Birth Date: {0}", (existingContactFacet.Birthdate.HasValue ? existingContactFacet.Birthdate.Value.Date.ToString("yyyy-MM-dd") : "[N/A]"));
+					}
+
+					//Write out interaction data
+					if(existingContact.Interactions != null)
+					{
+						foreach(var interaction in existingContact.Interactions)
+						{
+							outputHandler.WriteLine("Interaction Channel: {0}", interaction.ChannelId);
+							outputHandler.WriteLine(" > Start {0}", interaction.StartDateTime);
+							outputHandler.WriteLine(" > End {0}", interaction.EndDateTime);
+						}
 					}
 				}
 				catch (XdbExecutionException ex)
