@@ -95,6 +95,9 @@ namespace Sitecore.TechnicalMarketing.xConnectTutorial
 			{
 				definition = await ReferenceDataManager.CreateDefinition(GoalTypeName, InstantDemoGoalId, InstantDemoGoalName, XConnectUrl, Thumbprint, outputHandler);
 			}
+
+			//Get a contact with the interactions
+			contact = await ContactManager.GetContactWithInteractions(cfg, twitterId, DateTime.MinValue, DateTime.MaxValue, outputHandler);
 		}
 	}
 }
