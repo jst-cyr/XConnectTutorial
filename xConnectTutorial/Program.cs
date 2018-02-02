@@ -32,7 +32,7 @@ namespace Sitecore.TechnicalMarketing.xConnectTutorial
 		public const string OtherEventChannelId = "670BB98B-B352-40C1-99C8-880BF2AA4C54";
 
 		/// <summary>
-		/// The Sitecore Item ID of the "Instat Demo" goal in your Sitecore database:
+		/// The Sitecore Item ID of the "Instant Demo" goal in your Sitecore database:
 		///   PATH: /sitecore/system/Marketing Control Panel/Goals/Instant Demo
 		/// </summary>
 		public const string InstantDemoGoalId = "28A7C944-B8B6-45AD-A635-6F72E8F81F69";
