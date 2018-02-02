@@ -13,18 +13,20 @@ namespace Sitecore.TechnicalMarketing.xConnectTutorial
 	/// </summary>
 	public class InteractionManager
 	{
+		public OutputHandler Logger { get; set; }
+
 		/// <summary>
 		/// Create an interaction for the specified contact loaded from xConnect
 		/// </summary>
-		/// <param name="cfg">The client configuration</param>
+		/// <param name="cfg">The xConnect client configuration to use to make connections</param>
 		/// <param name="contact">The contact to create an interaction for</param>
 		/// <param name="channelId">The channel to create an interaction on</param>
 		/// <param name="goalId">The ID of the goal for the interaction event</param>
 		/// <param name="outputHandler">The handler for output</param>
 		/// <returns></returns>
-		public static async Task<Interaction> RegisterGoalInteraction(XConnectClientConfiguration cfg, Contact contact, string channelId, string goalId, OutputHandler outputHandler)
+		public virtual async Task<Interaction> RegisterGoalInteraction(XConnectClientConfiguration cfg, Contact contact, string channelId, string goalId)
 		{
-			outputHandler.WriteLine("Creating interaction for contact with ID: '{0}'. Channel: '{1}'. Goal: '{2}'", contact.Id, channelId, goalId);
+			Logger.WriteLine("Creating interaction for contact with ID: '{0}'. Channel: '{1}'. Goal: '{2}'", contact.Id, channelId, goalId);
 			using (var client = new XConnectClient(cfg))
 			{
 				try
@@ -43,14 +45,43 @@ namespace Sitecore.TechnicalMarketing.xConnectTutorial
 					await client.SubmitAsync();
 
 					// Get the last batch that was executed
-					outputHandler.WriteOperations(client.LastBatch);
+					Logger.WriteOperations(client.LastBatch);
 
 					return interaction;
 				}
 				catch (XdbExecutionException ex)
 				{
 					// Deal with exception
-					outputHandler.WriteError("Exception creating interaction", ex);
+					Logger.WriteError("Exception creating interaction", ex);
+				}
+			}
+
+			return null;
+		}
+
+		/// <summary>
+		/// Executes a search against the API to look for interactions falling between two particular dates.
+		/// </summary>
+		/// <param name="cfg">The xConnect client configuration to use to make connections</param>
+		/// <param name="startDate">The earliest start point for returned interactions</param>
+		/// <param name="endDate">The latest end point for returned interactions</param>
+		/// <returns></returns>
+		public virtual async Task<IAsyncEntityBatchEnumerator<Interaction>> SearchInteractionsByDate(XConnectClientConfiguration cfg, DateTime startDate, DateTime endDate)
+		{
+			using(var client = new XConnectClient(cfg))
+			{
+				try { 
+					//Execute the search using the date boundaries provided
+					var interactions = await client.Interactions.Where(i => i.StartDateTime >= startDate && i.EndDateTime <= endDate).GetBatchEnumerator();
+
+					//Output the data that was retrieved
+
+					//Return the set of interactions to the calling application
+					return interactions;
+				}
+				catch(XdbExecutionException ex)
+				{
+					//Output error
 				}
 			}
 

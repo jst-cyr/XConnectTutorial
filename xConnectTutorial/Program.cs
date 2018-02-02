@@ -59,8 +59,9 @@ namespace Sitecore.TechnicalMarketing.xConnectTutorial
 
 		private static async Task MainAsync(string[] args)
 		{
-			//Get output handler
+			//Initialize required handlers
 			var outputHandler = new OutputHandler();
+			var interactionManager = new InteractionManager() { Logger = outputHandler };
 
 			//Build a configuration to use to connect to xConnect
 			var cfg = new ConfigurationBuilder().GetClientConfiguration(XConnectUrl, XConnectUrl, XConnectUrl, Thumbprint);
@@ -87,7 +88,7 @@ namespace Sitecore.TechnicalMarketing.xConnectTutorial
 			var contact = await ContactManager.GetContact(cfg, twitterId, outputHandler);
 
 			//Create an interaction for the contact
-			var interaction = await InteractionManager.RegisterGoalInteraction(cfg, contact, OtherEventChannelId, InstantDemoGoalId, outputHandler);
+			var interaction = await interactionManager.RegisterGoalInteraction(cfg, contact, OtherEventChannelId, InstantDemoGoalId);
 
 			//Ensure our goal is defined in the Reference Data database
 			var definition = await ReferenceDataManager.GetDefinition(GoalTypeName, InstantDemoGoalId, XConnectUrl, Thumbprint, outputHandler);
