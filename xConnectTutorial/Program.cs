@@ -99,6 +99,11 @@ namespace Sitecore.TechnicalMarketing.xConnectTutorial
 
 			//Get a contact with the interactions
 			contact = await ContactManager.GetContactWithInteractions(cfg, twitterId, DateTime.MinValue, DateTime.MaxValue, outputHandler);
+
+			//Find all interactions created in a specific date range. Note that dates are required in UTC or local time
+			var startDate = new DateTime(2018, 1, 20).ToUniversalTime();
+			var endDate = new DateTime(2018, 1, 31).ToUniversalTime();
+			var interactions = await interactionManager.SearchInteractionsByDate(cfg, startDate, endDate);
 		}
 	}
 }

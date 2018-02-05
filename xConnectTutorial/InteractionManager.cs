@@ -71,17 +71,28 @@ namespace Sitecore.TechnicalMarketing.xConnectTutorial
 			using(var client = new XConnectClient(cfg))
 			{
 				try { 
+					//Build the query to be triggered
+					var queryable = client.Interactions.Where(i => i.StartDateTime >= startDate && i.EndDateTime <= endDate);
+
 					//Execute the search using the date boundaries provided
-					var interactions = await client.Interactions.Where(i => i.StartDateTime >= startDate && i.EndDateTime <= endDate).GetBatchEnumerator();
+					var enumerable = await queryable.GetBatchEnumerator(10);
 
 					//Output the data that was retrieved
+					while(await enumerable.MoveNext())
+					{
+						foreach(var interaction in enumerable.Current)
+						{
+							Logger.WriteInteraction(interaction);
+						}
+					}
 
 					//Return the set of interactions to the calling application
-					return interactions;
+					return enumerable;
 				}
 				catch(XdbExecutionException ex)
 				{
-					//Output error
+					// Deal with exception
+					Logger.WriteError("Exception executing search operation", ex);
 				}
 			}
 

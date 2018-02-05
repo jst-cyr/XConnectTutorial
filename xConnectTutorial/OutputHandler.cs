@@ -1,4 +1,5 @@
-﻿using Sitecore.Xdb.ReferenceData.Core.Results;
+﻿using Sitecore.XConnect;
+using Sitecore.Xdb.ReferenceData.Core.Results;
 using System;
 using System.Collections.Generic;
 
@@ -101,6 +102,21 @@ namespace Sitecore.TechnicalMarketing.xConnectTutorial
 			Console.WriteLine("{0} - {1}", result.Status, result.Message);
 
 			Console.ForegroundColor = ConsoleColor.White;
+		}
+
+		/// <summary>
+		/// Method for outputting an interaction object 
+		/// </summary>
+		/// <param name="interaction">The interaction data</param>
+		public void WriteInteraction(Interaction interaction)
+		{
+			Console.ForegroundColor = ConsoleColor.Green;
+			Console.WriteLine("Interaction {0}", interaction.Id);
+			Console.ForegroundColor = ConsoleColor.White;
+
+			Console.WriteLine(" > Start: {0} to End: {1}", interaction.StartDateTime, interaction.EndDateTime);
+			Console.WriteLine(" > Channel ID: {0}", interaction.ChannelId);
+			Console.WriteLine(" > Contact ID: {0}", interaction.Contact.Id);
 		}
 	}
 }
