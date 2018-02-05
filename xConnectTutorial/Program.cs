@@ -53,6 +53,7 @@ namespace Sitecore.TechnicalMarketing.xConnectTutorial
 		public const int SearchYear = 2018;
 		public const int SearchMonth = 1;
 		public const int SearchStartDay = 20;
+		public const int SearchDays = 10;
 
 		private static void Main(string[] args)
 		{
@@ -109,7 +110,7 @@ namespace Sitecore.TechnicalMarketing.xConnectTutorial
 
 			//Find all interactions created in a specific date range. Note that dates are required in UTC or local time
 			var startDate = new DateTime(SearchYear, SearchMonth, SearchStartDay).ToUniversalTime();
-			var endDate = startDate.AddDays(10);
+			var endDate = startDate.AddDays(SearchDays);
 			var interactions = await interactionManager.SearchInteractionsByDate(cfg, startDate, endDate);
 		}
 	}

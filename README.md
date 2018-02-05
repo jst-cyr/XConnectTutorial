@@ -13,5 +13,7 @@ In this class, you'll want to configure the following:
  - **TwitterIdentifier**: A default identifier is configured for creating new contacts. All contacts are created with this identifier + a generated GUID for uniqueness.
  - **OtherEventChannelId**: This is an item ID in your Sitecore database for the "Other Event" channel. Ensure this matches to your Sitecore ID at the path provided in the code comments.
  - **InstantDemoGoalId**: This is the item ID in your Sitecore database for the "Instant Demo" goal. Ensure this matches to your Sitecore ID at the path provided in the code comments.
+ - **SearchYear**, **SearchMonth**, **SearchStartDay**: This is the start day configuration for searching for interactions. Specify the year, month, date you want the search to start from.
+ - **SearchDays**: This is the number of days to search for when searching interactions.
  
 From here you can start the console app from within Visual Studio and you should be able to step through the various examples and see output in the console window with results.
