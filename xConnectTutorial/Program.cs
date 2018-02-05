@@ -47,6 +47,13 @@ namespace Sitecore.TechnicalMarketing.xConnectTutorial
 		/// </summary>
 		public const string GoalTypeName = "Sitecore XP Goal";
 
+		/// <summary>
+		/// Search parameters for starting interaction searches (year, month, day)
+		/// </summary>
+		public const int SearchYear = 2018;
+		public const int SearchMonth = 1;
+		public const int SearchStartDay = 20;
+
 		private static void Main(string[] args)
 		{
 			MainAsync(args).ConfigureAwait(false).GetAwaiter().GetResult();
@@ -101,8 +108,8 @@ namespace Sitecore.TechnicalMarketing.xConnectTutorial
 			contact = await ContactManager.GetContactWithInteractions(cfg, twitterId, DateTime.MinValue, DateTime.MaxValue, outputHandler);
 
 			//Find all interactions created in a specific date range. Note that dates are required in UTC or local time
-			var startDate = new DateTime(2018, 1, 20).ToUniversalTime();
-			var endDate = new DateTime(2018, 1, 31).ToUniversalTime();
+			var startDate = new DateTime(SearchYear, SearchMonth, SearchStartDay).ToUniversalTime();
+			var endDate = startDate.AddDays(10);
 			var interactions = await interactionManager.SearchInteractionsByDate(cfg, startDate, endDate);
 		}
 	}
