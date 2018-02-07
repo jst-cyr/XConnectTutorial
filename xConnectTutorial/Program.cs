@@ -71,6 +71,7 @@ namespace Sitecore.TechnicalMarketing.xConnectTutorial
 			var outputHandler = new OutputHandler();
 			var interactionManager = new InteractionManager() { Logger = outputHandler };
 			var contactManager = new ContactManager() { Logger = outputHandler };
+			var referenceDataManager = new ReferenceDataManager() { Logger = outputHandler };
 
 			//Build a configuration to use to connect to xConnect
 			var cfg = new ConfigurationBuilder().GetClientConfiguration(XConnectUrl, XConnectUrl, XConnectUrl, Thumbprint);
@@ -100,10 +101,10 @@ namespace Sitecore.TechnicalMarketing.xConnectTutorial
 			var interaction = await interactionManager.RegisterGoalInteraction(cfg, contact, OtherEventChannelId, InstantDemoGoalId);
 
 			//Ensure our goal is defined in the Reference Data database
-			var definition = await ReferenceDataManager.GetDefinition(GoalTypeName, InstantDemoGoalId, XConnectUrl, Thumbprint, outputHandler);
+			var definition = await referenceDataManager.GetDefinition(GoalTypeName, InstantDemoGoalId, XConnectUrl, Thumbprint);
 			if (definition == null)
 			{
-				definition = await ReferenceDataManager.CreateDefinition(GoalTypeName, InstantDemoGoalId, InstantDemoGoalName, XConnectUrl, Thumbprint, outputHandler);
+				definition = await referenceDataManager.CreateDefinition(GoalTypeName, InstantDemoGoalId, InstantDemoGoalName, XConnectUrl, Thumbprint);
 			}
 
 			//Get a contact with the interactions

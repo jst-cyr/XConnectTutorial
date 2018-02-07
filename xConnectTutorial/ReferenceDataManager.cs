@@ -13,6 +13,8 @@ namespace Sitecore.TechnicalMarketing.xConnectTutorial
 	/// </summary>
 	public class ReferenceDataManager
 	{
+		public OutputHandler Logger { get; set; }
+
 		/// <summary>
 		/// Retrieve a specific definition from the reference data
 		/// </summary>
@@ -20,9 +22,8 @@ namespace Sitecore.TechnicalMarketing.xConnectTutorial
 		/// <param name="moniker">The moniker of the definition, refers to the Sitecore GUID of the item</param>
 		/// <param name="referenceDataHost">The host URL of the reference data service</param>
 		/// <param name="thumbprint">The thumbprint for the endpoint certificate</param>
-		/// <param name="outputHandler">The handler for writing output</param>
 		/// <returns></returns>
-		public static async Task<Definition<string, string>> GetDefinition(string definitionTypeName, string moniker, string referenceDataHost, string thumbprint, OutputHandler outputHandler)
+		public virtual async Task<Definition<string, string>> GetDefinition(string definitionTypeName, string moniker, string referenceDataHost, string thumbprint)
 		{
 			using (var client = BuildClient(referenceDataHost, thumbprint))
 			{
@@ -36,18 +37,18 @@ namespace Sitecore.TechnicalMarketing.xConnectTutorial
 
 					if (definition != null)
 					{
-						outputHandler.WriteLine("Definition found: {0}", definition.Key.Moniker);
+						Logger.WriteLine("Definition found: {0}", definition.Key.Moniker);
 					}
 					else
 					{
-						outputHandler.WriteLine("No definition found with moniker: {0} of type {1}", moniker, definitionTypeName);
+						Logger.WriteLine("No definition found with moniker: {0} of type {1}", moniker, definitionTypeName);
 					}
 
 					return definition;
 				}
 				catch (Exception ex)
 				{
-					outputHandler.WriteError("Error retrieving definition", ex);
+					Logger.WriteError("Error retrieving definition", ex);
 				}
 			}
 
@@ -62,9 +63,8 @@ namespace Sitecore.TechnicalMarketing.xConnectTutorial
 		/// <param name="definitionName">The name of the definition (to be used in culture data)</param>
 		/// <param name="referenceDataHost">The host URL of the reference data service</param>
 		/// <param name="thumbprint">The thumbprint for the endpoint certificate</param>
-		/// <param name="outputHandler">The handler for writing output</param>
 		/// <returns></returns>
-		public static async Task<Definition<string, string>> CreateDefinition(string definitionTypeName, string moniker, string definitionName, string referenceDataHost, string thumbprint, OutputHandler outputHandler)
+		public virtual async Task<Definition<string, string>> CreateDefinition(string definitionTypeName, string moniker, string definitionName, string referenceDataHost, string thumbprint)
 		{
 			using (var client = BuildClient(referenceDataHost, thumbprint))
 			{
@@ -91,13 +91,13 @@ namespace Sitecore.TechnicalMarketing.xConnectTutorial
 					//Create the definition
 					var result = await client.SaveAsync(definition);
 
-					outputHandler.WriteSaveResult(result);
+					Logger.WriteSaveResult(result);
 
 					return definition;
 				}
 				catch (Exception ex)
 				{
-					outputHandler.WriteError("Error creating definition", ex);
+					Logger.WriteError("Error creating definition", ex);
 				}
 			}
 
@@ -110,7 +110,7 @@ namespace Sitecore.TechnicalMarketing.xConnectTutorial
 		/// <param name="referenceDataHost">The host URL of the reference data service</param>
 		/// <param name="thumbprint">The thumbprint for the endpoint certificate</param>
 		/// <returns>A new instance of the client</returns>
-		public static ReferenceDataHttpClient BuildClient(string referenceDataHost, string thumbprint)
+		public virtual ReferenceDataHttpClient BuildClient(string referenceDataHost, string thumbprint)
 		{
 			var converter = new DefinitionEnvelopeJsonConverter();
 
