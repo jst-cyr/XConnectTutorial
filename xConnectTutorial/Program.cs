@@ -70,6 +70,7 @@ namespace Sitecore.TechnicalMarketing.xConnectTutorial
 			//Initialize required handlers
 			var outputHandler = new OutputHandler();
 			var interactionManager = new InteractionManager() { Logger = outputHandler };
+			var contactManager = new ContactManager() { Logger = outputHandler };
 
 			//Build a configuration to use to connect to xConnect
 			var cfg = new ConfigurationBuilder().GetClientConfiguration(XConnectUrl, XConnectUrl, XConnectUrl, Thumbprint);
@@ -90,10 +91,10 @@ namespace Sitecore.TechnicalMarketing.xConnectTutorial
 
 			//Create a contact
 			var twitterId = TwitterIdentifier + Guid.NewGuid().ToString("N");
-			var identifier = await ContactManager.CreateContact(cfg, twitterId, outputHandler);
+			var identifier = await contactManager.CreateContact(cfg, twitterId);
 
 			//Get the contact that was created
-			var contact = await ContactManager.GetContact(cfg, twitterId, outputHandler);
+			var contact = await contactManager.GetContact(cfg, twitterId);
 
 			//Create an interaction for the contact
 			var interaction = await interactionManager.RegisterGoalInteraction(cfg, contact, OtherEventChannelId, InstantDemoGoalId);
@@ -106,7 +107,7 @@ namespace Sitecore.TechnicalMarketing.xConnectTutorial
 			}
 
 			//Get a contact with the interactions
-			contact = await ContactManager.GetContactWithInteractions(cfg, twitterId, DateTime.MinValue, DateTime.MaxValue, outputHandler);
+			contact = await contactManager.GetContactWithInteractions(cfg, twitterId, DateTime.MinValue, DateTime.MaxValue);
 
 			//Find all interactions created in a specific date range. Note that dates are required in UTC or local time
 			var startDate = new DateTime(SearchYear, SearchMonth, SearchStartDay).ToUniversalTime();

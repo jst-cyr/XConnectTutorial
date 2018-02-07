@@ -1,4 +1,5 @@
 ﻿using Sitecore.XConnect;
+using Sitecore.XConnect.Collection.Model;
 using Sitecore.Xdb.ReferenceData.Core.Results;
 using System;
 using System.Collections.Generic;
@@ -111,12 +112,43 @@ namespace Sitecore.TechnicalMarketing.xConnectTutorial
 		public void WriteInteraction(Interaction interaction)
 		{
 			Console.ForegroundColor = ConsoleColor.Green;
-			Console.WriteLine("Interaction {0}", interaction.Id);
+			Console.WriteLine("Interaction ID: {0}", interaction.Id);
 			Console.ForegroundColor = ConsoleColor.White;
 
 			Console.WriteLine(" > Start: {0} to End: {1}", interaction.StartDateTime, interaction.EndDateTime);
 			Console.WriteLine(" > Channel ID: {0}", interaction.ChannelId);
 			Console.WriteLine(" > Contact ID: {0}", interaction.Contact.Id);
+		}
+
+		/// <summary>
+		/// Method for outputting Contact details
+		/// </summary>
+		/// <param name="contact">The contact data to extract</param>
+		public void WriteContact(Contact contact)
+		{
+			Console.ForegroundColor = ConsoleColor.Green;
+			Console.WriteLine("Contact ID: {0}", contact.Id.ToString());
+			Console.ForegroundColor = ConsoleColor.White;
+
+			PersonalInformation personalInfoFacet = contact.GetFacet<PersonalInformation>(PersonalInformation.DefaultFacetKey);
+			if (personalInfoFacet != null)
+			{
+				Console.WriteLine(" > Contact Name: {0} {1}", personalInfoFacet.FirstName, personalInfoFacet.LastName);
+				Console.WriteLine(" > Contact Job Title: {0}", personalInfoFacet.JobTitle);
+				Console.WriteLine(" > Contact Birth Date: {0}", (personalInfoFacet.Birthdate.HasValue ? personalInfoFacet.Birthdate.Value.Date.ToString("yyyy-MM-dd") : "[N/A]"));
+			}
+
+			//Write out interaction data
+			if (contact.Interactions != null)
+			{
+				Console.WriteLine(" > Interactions:");
+				foreach (var interaction in contact.Interactions)
+				{
+					Console.WriteLine(" >> Interaction ID: {0}", interaction.Id);
+					Console.WriteLine(" >>> Start: {0} to End: {1}", interaction.StartDateTime, interaction.EndDateTime);
+					Console.WriteLine(" >>> Channel ID: {0}", interaction.ChannelId);
+				}
+			}
 		}
 	}
 }

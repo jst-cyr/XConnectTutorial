@@ -11,20 +11,21 @@ namespace Sitecore.TechnicalMarketing.xConnectTutorial
 	/// </summary>
 	public class ContactManager
 	{
+		public OutputHandler Logger { get; set; }
+
 		/// <summary>
 		/// Create a contact
 		/// </summary>
 		/// <param name="cfg">The client configuration for connecting</param>
 		/// <param name="twitterId">The identifier of the contact to create</param>'
-		/// <param name="outputHandler">The object handling output</param>
-		public static async Task<ContactIdentifier> CreateContact(XConnectClientConfiguration cfg, string twitterId, OutputHandler outputHandler)
+		public virtual async Task<ContactIdentifier> CreateContact(XConnectClientConfiguration cfg, string twitterId)
 		{
 			// Identifier for a 'known' contact
 			var identifier = new ContactIdentifier("twitter", twitterId, ContactIdentifierType.Known);
 			var identifiers = new ContactIdentifier[] { identifier };
 
 			// Print out the identifier that is going to be used
-			outputHandler.WriteLine("Creating Contact with Identifier:" + identifier.Identifier);
+			Logger.WriteLine("Creating Contact with Identifier:" + identifier.Identifier);
 
 			// Create a new contact object from the identifier
 			Contact knownContact = new Contact(identifiers);
@@ -47,12 +48,12 @@ namespace Sitecore.TechnicalMarketing.xConnectTutorial
 					await client.SubmitAsync();
 
 					// Get the last batch that was executed
-					outputHandler.WriteOperations(client.LastBatch);
+					Logger.WriteOperations(client.LastBatch);
 				}
 				catch (XdbExecutionException ex)
 				{
 					// Deal with exception
-					outputHandler.WriteError("Exception creating contact", ex);
+					Logger.WriteError("Exception creating contact", ex);
 				}
 			}
 
@@ -64,11 +65,10 @@ namespace Sitecore.TechnicalMarketing.xConnectTutorial
 		/// </summary>
 		/// <param name="cfg">The client configuration for connecting</param>
 		/// <param name="twitterId">The identifier of the contact to create</param>
-		/// <param name="outputHandler">The object handling output</param>
 		/// <returns>The matching contact object</returns>
-		public static async Task<Contact> GetContact(XConnectClientConfiguration cfg, string twitterId, OutputHandler outputHandler)
+		public virtual async Task<Contact> GetContact(XConnectClientConfiguration cfg, string twitterId)
 		{
-			return await GetContactWithInteractions(cfg, twitterId, null, null, outputHandler);
+			return await GetContactWithInteractions(cfg, twitterId, null, null);
 		}
 
 		/// <summary>
@@ -78,13 +78,12 @@ namespace Sitecore.TechnicalMarketing.xConnectTutorial
 		/// <param name="twitterId">The identifier of the contact to create</param>
 		/// <param name="interactionStartTime">The start range of interactions to return</param>
 		/// <param name="interactionEndTime">The end range of interactions to return</param>
-		/// <param name="outputHandler">The object handling output</param>
 		/// <returns>The matching contact object</returns>
-		public static async Task<Contact> GetContactWithInteractions(XConnectClientConfiguration cfg, string twitterId, DateTime? interactionStartTime, DateTime? interactionEndTime, OutputHandler outputHandler)
+		public virtual async Task<Contact> GetContactWithInteractions(XConnectClientConfiguration cfg, string twitterId, DateTime? interactionStartTime, DateTime? interactionEndTime)
 		{
 			Contact existingContact = null;
 
-			outputHandler.WriteLine("Retrieving Contact with Identifier:" + twitterId);
+			Logger.WriteLine("Retrieving Contact with Identifier:" + twitterId);
 
 			// Initialize a client using the validated configuration
 			using (var client = new XConnectClient(cfg))
@@ -109,36 +108,17 @@ namespace Sitecore.TechnicalMarketing.xConnectTutorial
 					existingContact = await client.GetAsync<Contact>(reference, contactOptions);
 					if (existingContact == null)
 					{
-						outputHandler.WriteLine("No contact found with ID '{0}'", twitterId);
+						Logger.WriteLine("No contact found with ID '{0}'", twitterId);
 						return null;
 					}
 
 					//Output information about the contact
-					outputHandler.WriteLine("Contact ID: " + existingContact.Id.ToString());
-					
-					PersonalInformation existingContactFacet = existingContact.GetFacet<PersonalInformation>(PersonalInformation.DefaultFacetKey);
-					if (existingContactFacet != null)
-					{
-						outputHandler.WriteLine("Contact Name: {0} {1}", existingContactFacet.FirstName, existingContactFacet.LastName);
-						outputHandler.WriteLine("Contact Job Title: {0}", existingContactFacet.JobTitle);
-						outputHandler.WriteLine("Contact Birth Date: {0}", (existingContactFacet.Birthdate.HasValue ? existingContactFacet.Birthdate.Value.Date.ToString("yyyy-MM-dd") : "[N/A]"));
-					}
-
-					//Write out interaction data
-					if(existingContact.Interactions != null)
-					{
-						foreach(var interaction in existingContact.Interactions)
-						{
-							outputHandler.WriteLine("Interaction Channel: {0}", interaction.ChannelId);
-							outputHandler.WriteLine(" > Start {0}", interaction.StartDateTime);
-							outputHandler.WriteLine(" > End {0}", interaction.EndDateTime);
-						}
-					}
+					Logger.WriteContact(existingContact);
 				}
 				catch (XdbExecutionException ex)
 				{
 					// Deal with exception
-					outputHandler.WriteError("Exception retrieving contact", ex);
+					Logger.WriteError("Exception retrieving contact", ex);
 				}
 			}
 
