@@ -67,7 +67,8 @@ namespace Sitecore.TechnicalMarketing.xConnectTutorial
 		/// <returns></returns>
 		public virtual async Task<IAsyncEntityBatchEnumerator<Interaction>> SearchInteractionsByDate(XConnectClientConfiguration cfg, DateTime startDate, DateTime endDate)
 		{
-			using(var client = new XConnectClient(cfg))
+			Logger.WriteLine("Searching for all interactions between {0} and {1}", startDate, endDate);
+			using (var client = new XConnectClient(cfg))
 			{
 				try { 
 					//Build the query to be triggered
