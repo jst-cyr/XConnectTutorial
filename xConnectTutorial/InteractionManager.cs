@@ -22,7 +22,6 @@ namespace Sitecore.TechnicalMarketing.xConnectTutorial
 		/// <param name="contact">The contact to create an interaction for</param>
 		/// <param name="channelId">The channel to create an interaction on</param>
 		/// <param name="goalId">The ID of the goal for the interaction event</param>
-		/// <param name="outputHandler">The handler for output</param>
 		/// <returns></returns>
 		public virtual async Task<Interaction> RegisterGoalInteraction(XConnectClientConfiguration cfg, Contact contact, string channelId, string goalId)
 		{
