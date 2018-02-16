@@ -84,7 +84,7 @@ namespace Sitecore.TechnicalMarketing.xConnectTutorial
 			// Loop through operations and check status
 			foreach (var operation in operations)
 			{
-				Console.WriteLine(operation.OperationType + operation.Target.GetType().ToString() + " Operation: " + operation.Status);
+				Console.WriteLine("{0} {1} Operation: {2}", operation.OperationType, operation.Target.GetType().ToString(), operation.Status);
 			}
 
 			//Reset color

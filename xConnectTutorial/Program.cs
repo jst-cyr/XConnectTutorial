@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Threading.Tasks;
 using Sitecore.XConnect.Client;
+using Sitecore.XConnect.Collection.Model;
 
 namespace Sitecore.TechnicalMarketing.xConnectTutorial
 {
@@ -73,9 +74,13 @@ namespace Sitecore.TechnicalMarketing.xConnectTutorial
 			var contactManager = new ContactManager() { Logger = outputHandler };
 			var referenceDataManager = new ReferenceDataManager() { Logger = outputHandler };
 
+			//Initialize IP information which will be used for tracking events.
+			var ipInfo = new IpInfo("127.0.0.1");
+			ipInfo.BusinessName = "Home";
+
 			//Build a configuration to use to connect to xConnect
 			var cfg = new ConfigurationBuilder().GetClientConfiguration(XConnectUrl, XConnectUrl, XConnectUrl, Thumbprint);
-
+			
 			//Test configuration
 			try
 			{
@@ -98,7 +103,7 @@ namespace Sitecore.TechnicalMarketing.xConnectTutorial
 			var contact = await contactManager.GetContact(cfg, twitterId);
 
 			//Create an interaction for the contact
-			var interaction = await interactionManager.RegisterGoalInteraction(cfg, contact, OtherEventChannelId, InstantDemoGoalId);
+			var interaction = await interactionManager.RegisterGoalInteraction(cfg, contact, OtherEventChannelId, InstantDemoGoalId, ipInfo);
 
 			//Ensure our goal is defined in the Reference Data database
 			var definition = await referenceDataManager.GetDefinition(GoalTypeName, InstantDemoGoalId, XConnectUrl, Thumbprint);

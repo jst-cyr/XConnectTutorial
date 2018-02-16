@@ -1,5 +1,6 @@
 ﻿using Sitecore.XConnect;
 using Sitecore.XConnect.Client;
+using Sitecore.XConnect.Collection.Model;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -22,8 +23,9 @@ namespace Sitecore.TechnicalMarketing.xConnectTutorial
 		/// <param name="contact">The contact to create an interaction for</param>
 		/// <param name="channelId">The channel to create an interaction on</param>
 		/// <param name="goalId">The ID of the goal for the interaction event</param>
+		/// <param name="ipInfo">The ip address the goal was triggered from</param>
 		/// <returns></returns>
-		public virtual async Task<Interaction> RegisterGoalInteraction(XConnectClientConfiguration cfg, Contact contact, string channelId, string goalId)
+		public virtual async Task<Interaction> RegisterGoalInteraction(XConnectClientConfiguration cfg, Contact contact, string channelId, string goalId, IpInfo ipInfo)
 		{
 			Logger.WriteLine("Creating interaction for contact with ID: '{0}'. Channel: '{1}'. Goal: '{2}'", contact.Id, channelId, goalId);
 			using (var client = new XConnectClient(cfg))
@@ -36,6 +38,11 @@ namespace Sitecore.TechnicalMarketing.xConnectTutorial
 					//Create the event - all interactions must have at least one event
 					var xConnectEvent = new Goal(Guid.Parse(goalId), DateTime.UtcNow);
 					interaction.Events.Add(xConnectEvent);
+
+					//Add in IP information for where the goal was triggered from
+					if(ipInfo != null) { 
+						client.SetFacet<IpInfo>(interaction, IpInfo.DefaultFacetKey, ipInfo);
+					}
 
 					//Add the interaction to the client
 					client.AddInteraction(interaction);
