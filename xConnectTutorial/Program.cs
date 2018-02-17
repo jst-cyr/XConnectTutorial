@@ -2,6 +2,7 @@
 using System.Threading.Tasks;
 using Sitecore.XConnect.Client;
 using Sitecore.XConnect.Collection.Model;
+using System.Linq;
 
 namespace Sitecore.TechnicalMarketing.xConnectTutorial
 {
@@ -78,7 +79,9 @@ namespace Sitecore.TechnicalMarketing.xConnectTutorial
 			var ipInfo = new IpInfo("127.0.0.1");
 			ipInfo.BusinessName = "Home";
 
-			//Build a configuration to use to connect to xConnect
+			/**
+			 * TUTORIAL: Building the configuration used to connect to xConnect
+			 */
 			var cfg = new ConfigurationBuilder().GetClientConfiguration(XConnectUrl, XConnectUrl, XConnectUrl, Thumbprint);
 			
 			//Test configuration
@@ -95,30 +98,59 @@ namespace Sitecore.TechnicalMarketing.xConnectTutorial
 				return;
 			}
 
+
+			/**
+			 * TUTORIAL: Create and retrieve a contact
+			 */
 			//Create a contact
 			var twitterId = TwitterIdentifier + Guid.NewGuid().ToString("N");
 			var identifier = await contactManager.CreateContact(cfg, twitterId);
 
-			//Get the contact that was created
+			//Retrieve a contact that was created
 			var contact = await contactManager.GetContact(cfg, twitterId);
 
-			//Create an interaction for the contact
+
+			/**
+			 * TUTORIAL: Register a goal for the created contact
+			 */
 			var interaction = await interactionManager.RegisterGoalInteraction(cfg, contact, OtherEventChannelId, InstantDemoGoalId, ipInfo);
 
-			//Ensure our goal is defined in the Reference Data database
+
+			/**
+			 * TUTORIAL: Reference Data Manager
+			 */
 			var definition = await referenceDataManager.GetDefinition(GoalTypeName, InstantDemoGoalId, XConnectUrl, Thumbprint);
 			if (definition == null)
 			{
 				definition = await referenceDataManager.CreateDefinition(GoalTypeName, InstantDemoGoalId, InstantDemoGoalName, XConnectUrl, Thumbprint);
 			}
 
+
+			/**
+			 * TUTORIAL: Get a contact with its list of interactions
+			 */
 			//Get a contact with the interactions
 			contact = await contactManager.GetContactWithInteractions(cfg, twitterId, DateTime.MinValue, DateTime.MaxValue);
 
+
+			/**
+			 * TUTORIAL: Search Interactions
+			 */
 			//Find all interactions created in a specific date range. Note that dates are required in UTC or local time
 			var startDate = new DateTime(SearchYear, SearchMonth, SearchStartDay).ToUniversalTime();
 			var endDate = startDate.AddDays(SearchDays);
 			var interactions = await interactionManager.SearchInteractionsByDate(cfg, startDate, endDate);
+
+
+			/**
+			 * TUTORIAL: Expand a single interaction search results
+			 */
+			//Look for the first result in the search results
+			var interactionResult = interactions != null ? interactions.LastOrDefault() : null;
+			//If the search result has sufficient contact and interaction ID data present, request the expanded details about the interaction
+			if (interactionResult != null && interactionResult.Contact != null && interactionResult.Contact.Id.HasValue && interactionResult.Id.HasValue) {
+				var triggeredGoal = await interactionManager.GetInteraction(cfg, interactionResult.Contact.Id.Value, interactionResult.Id.Value);
+			}
 		}
 	}
 }

@@ -66,13 +66,55 @@ namespace Sitecore.TechnicalMarketing.xConnectTutorial
 		}
 
 		/// <summary>
+		/// You can explicitly request a single interaction, but you must provide both the contact ID and the interaction ID.
+		/// Most external systems won't have this data, but it could be useful if you want to load details of an interaction results from a search
+		/// and return additional facet data.
+		/// </summary>
+		/// <param name="cfg">The xConnect client configuration to use to make connections</param>
+		/// <param name="contactId">The contact the interaction is associated with</param>
+		/// <param name="interactionId">The interaction event identifier</param>
+		/// <returns></returns>
+		public virtual async Task<Interaction> GetInteraction(XConnectClientConfiguration cfg, Guid contactId, Guid interactionId)
+		{
+			Logger.WriteLine("Retrieving interaction for contact with ID: '{0}'. Interaction ID: '{1}'.", contactId, interactionId);
+			using (var client = new XConnectClient(cfg))
+			{
+				try
+				{
+					//Get the interaction reference that will be used to execute the lookup
+					var interactionReference = new InteractionReference(contactId, interactionId);
+
+					//Define the facets that should be expanded
+					var expandOptions = new InteractionExpandOptions(new string[] { IpInfo.DefaultFacetKey });
+					expandOptions.Contact = new RelatedContactExpandOptions(new string[] { PersonalInformation.DefaultFacetKey });
+					expandOptions.Expand<WebVisit>();
+
+					//Query the client for the interaction
+					var interaction = await client.GetAsync<Interaction>(interactionReference, expandOptions);
+
+					//Show the information about the interaction
+					Logger.WriteInteraction(interaction);
+
+					return interaction;
+				}
+				catch (XdbExecutionException ex)
+				{
+					// Deal with exception
+					Logger.WriteError("Exception creating interaction", ex);
+				}
+			}
+
+			return null;
+		}
+
+		/// <summary>
 		/// Executes a search against the API to look for interactions falling between two particular dates.
 		/// </summary>
 		/// <param name="cfg">The xConnect client configuration to use to make connections</param>
 		/// <param name="startDate">The earliest start point for returned interactions</param>
 		/// <param name="endDate">The latest end point for returned interactions</param>
 		/// <returns></returns>
-		public virtual async Task<IAsyncEntityBatchEnumerator<Interaction>> SearchInteractionsByDate(XConnectClientConfiguration cfg, DateTime startDate, DateTime endDate)
+		public virtual async Task<List<Interaction>> SearchInteractionsByDate(XConnectClientConfiguration cfg, DateTime startDate, DateTime endDate)
 		{
 			Logger.WriteLine("Searching for all interactions between {0} and {1}", startDate, endDate);
 			using (var client = new XConnectClient(cfg))
@@ -84,17 +126,19 @@ namespace Sitecore.TechnicalMarketing.xConnectTutorial
 					//Execute the search using the date boundaries provided
 					var enumerable = await queryable.GetBatchEnumerator(10);
 
-					//Output the data that was retrieved
+					//Output the data that was retrieved and collect into a list to return
+					var interactions = new List<Interaction>();
 					while(await enumerable.MoveNext())
 					{
 						foreach(var interaction in enumerable.Current)
 						{
+							interactions.Add(interaction);
 							Logger.WriteInteraction(interaction);
 						}
 					}
 
 					//Return the set of interactions to the calling application
-					return enumerable;
+					return interactions;
 				}
 				catch(XdbExecutionException ex)
 				{

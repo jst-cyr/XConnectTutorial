@@ -118,6 +118,17 @@ namespace Sitecore.TechnicalMarketing.xConnectTutorial
 			Console.WriteLine(" > Start: {0} to End: {1}", interaction.StartDateTime, interaction.EndDateTime);
 			Console.WriteLine(" > Channel ID: {0}", interaction.ChannelId);
 			Console.WriteLine(" > Contact ID: {0}", interaction.Contact.Id);
+
+			var ipInfoFacet = interaction.GetFacet<IpInfo>(IpInfo.DefaultFacetKey);
+			if(ipInfoFacet != null)
+			{
+				Console.WriteLine(" > IP Information - Address: {0}, Business: {1}", ipInfoFacet.IpAddress, ipInfoFacet.BusinessName);
+			}
+
+			var contact = interaction.Contact as Contact;
+			if(contact != null) { 
+				WriteContact(contact);
+			}
 		}
 
 		/// <summary>
