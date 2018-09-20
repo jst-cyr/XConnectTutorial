@@ -25,16 +25,18 @@ namespace Sitecore.TechnicalMarketing.xConnectTutorial
 		public virtual XConnectClientConfiguration GetClientConfiguration(string collectionHost, string searchHost, string configHost, string thumbprint)
 		{
 			//Set up the certificate used to connect to xConnect endpoints
-			CertificateWebRequestHandlerModifierOptions options = CertificateWebRequestHandlerModifierOptions.Parse("StoreName=My;StoreLocation=LocalMachine;FindType=FindByThumbprint;FindValue=" + thumbprint);
+			var options = CertificateWebRequestHandlerModifierOptions.Parse("StoreName=My;StoreLocation=LocalMachine;FindType=FindByThumbprint;FindValue=" + thumbprint);
 			var certificateModifier = new CertificateWebRequestHandlerModifier(options);
 
-			//Set up timeout modifier for the client
-			List<IHttpClientModifier> clientModifiers = new List<IHttpClientModifier>();
-			var timeoutClientModifier = new TimeoutHttpClientModifier(new TimeSpan(0, 0, 20));
-			clientModifiers.Add(timeoutClientModifier);
+            //Set up timeout modifier for the client
+		    var timeoutClientModifier = new TimeoutHttpClientModifier(new TimeSpan(0, 0, 20));
+            var clientModifiers = new List<IHttpClientModifier>
+            {
+                timeoutClientModifier
+            };
 
-			//Initialize the clients. Each requires the certificate in order to open the connection
-			var collectionClient = new CollectionWebApiClient(new Uri(collectionHost + "/odata"), clientModifiers, new[] { certificateModifier });
+            //Initialize the clients. Each requires the certificate in order to open the connection
+            var collectionClient = new CollectionWebApiClient(new Uri(collectionHost + "/odata"), clientModifiers, new[] { certificateModifier });
 			var searchClient = new SearchWebApiClient(new Uri(searchHost + "/odata"), clientModifiers, new[] { certificateModifier });
 			var configurationClient = new ConfigurationWebApiClient(new Uri(configHost + "/configuration"), clientModifiers, new[] { certificateModifier });
 
@@ -53,7 +55,7 @@ namespace Sitecore.TechnicalMarketing.xConnectTutorial
 		public virtual IWebRequestHandlerModifier[] GetReferenceDataHandlers(string thumbprint)
 		{
 			// Valid certificate thumbprints must be passed in
-			CertificateWebRequestHandlerModifierOptions options = CertificateWebRequestHandlerModifierOptions.Parse("StoreName=My;StoreLocation=LocalMachine;FindType=FindByThumbprint;FindValue=" + thumbprint);
+			var options = CertificateWebRequestHandlerModifierOptions.Parse("StoreName=My;StoreLocation=LocalMachine;FindType=FindByThumbprint;FindValue=" + thumbprint);
 
 			// Optional timeout modifier
 			IWebRequestHandlerModifier[] handlers = { new CertificateWebRequestHandlerModifier(options) };
