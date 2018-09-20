@@ -10,56 +10,16 @@ namespace Sitecore.TechnicalMarketing.xConnectTutorial
 	/// This Program and related classes is largely inspired and based off of the work of Martina Wehlander in the Sitecore xConnect Tutorials:
 	/// <see cref="https://doc.sitecore.net/developers/xp/getting-started/#tutorials-xconnect"/>
 	/// </summary>
-	public class Program
+	internal class Program
 	{
-		/// <summary>
-		/// Thumbprint of certificate used to connect to xConnect endpoint
-		/// </summary>
-		public const string Thumbprint = "1D48BBD0ABB629F283787BEDD1227184473D1B76";
+		
 
-		/// <summary>
-		/// Base URL of xConnect installation. Used for opening connections.
-		/// </summary>
-		public const string XConnectUrl = "https://sc9.xconnect.local";
 
-		/// <summary>
-		/// Base Twitter Identifier to be used when generating new contacts
-		/// </summary>
-		public const string TwitterIdentifier = "myrtlesitecore";
-
-		/// <summary>
-		/// The Sitecore Item ID of the "Other Event" channel in your Sitecore database:
-		///   PATH: /sitecore/system/Marketing Control Panel/Taxonomies/Channel/Offline/Event/Other event
-		/// </summary>
-		public const string OtherEventChannelId = "670BB98B-B352-40C1-99C8-880BF2AA4C54";
-
-		/// <summary>
-		/// The Sitecore Item ID of the "Instant Demo" goal in your Sitecore database:
-		///   PATH: /sitecore/system/Marketing Control Panel/Goals/Instant Demo
-		/// </summary>
-		public const string InstantDemoGoalId = "28A7C944-B8B6-45AD-A635-6F72E8F81F69";
-
-		/// <summary>
-		/// The display name for the instant demo goal. Stored in the definition in the Reference Data tables.
-		/// </summary>
-		public const string InstantDemoGoalName = "Instant Demo";
-
-		/// <summary>
-		/// The definition type name for Sitecore Goals
-		/// </summary>
-		public const string GoalTypeName = "Sitecore XP Goal";
-
-		/// <summary>
-		/// Search parameters for starting interaction searches (year, month, day)
-		/// </summary>
-		public const int SearchYear = 2018;
-		public const int SearchMonth = 1;
-		public const int SearchStartDay = 20;
-		public const int SearchDays = 10;
-
+        
 		private static void Main(string[] args)
 		{
 			MainAsync(args).ConfigureAwait(false).GetAwaiter().GetResult();
+		  
 			Console.ForegroundColor = ConsoleColor.DarkGreen;
 			Console.WriteLine("");
 			Console.WriteLine("END OF PROGRAM.");
@@ -74,15 +34,14 @@ namespace Sitecore.TechnicalMarketing.xConnectTutorial
 			var interactionManager = new InteractionManager() { Logger = outputHandler };
 			var contactManager = new ContactManager() { Logger = outputHandler };
 			var referenceDataManager = new ReferenceDataManager() { Logger = outputHandler };
-
-			//Initialize IP information which will be used for tracking events.
-			var ipInfo = new IpInfo("127.0.0.1");
-			ipInfo.BusinessName = "Home";
+            var configuration = new Configuration();
+            //Initialize IP information which will be used for tracking events.
+            var ipInfo = new IpInfo("127.0.0.1") {BusinessName = "Home"};
 
 			/**
 			 * TUTORIAL: Building the configuration used to connect to xConnect
 			 */
-			var cfg = new ConfigurationBuilder().GetClientConfiguration(XConnectUrl, XConnectUrl, XConnectUrl, Thumbprint);
+			var cfg = new ConfigurationBuilder().GetClientConfiguration(configuration.XConnectUrl, configuration.XConnectUrl, configuration.XConnectUrl, configuration.Thumbprint);
 			
 			//Test configuration
 			try
@@ -103,7 +62,7 @@ namespace Sitecore.TechnicalMarketing.xConnectTutorial
 			 * TUTORIAL: Create and retrieve a contact
 			 */
 			//Create a contact
-			var twitterId = TwitterIdentifier + Guid.NewGuid().ToString("N");
+			var twitterId = configuration.TwitterIdentifier + Guid.NewGuid().ToString("N");
 			var identifier = await contactManager.CreateContact(cfg, twitterId);
 
 			//Retrieve a contact that was created
@@ -113,16 +72,16 @@ namespace Sitecore.TechnicalMarketing.xConnectTutorial
 			/**
 			 * TUTORIAL: Register a goal for the created contact
 			 */
-			var interaction = await interactionManager.RegisterGoalInteraction(cfg, contact, OtherEventChannelId, InstantDemoGoalId, ipInfo);
+			var interaction = await interactionManager.RegisterGoalInteraction(cfg, contact, configuration.OtherEventChannelId, configuration.InstantDemoGoalId, ipInfo);
 
 
 			/**
 			 * TUTORIAL: Reference Data Manager
 			 */
-			var definition = await referenceDataManager.GetDefinition(GoalTypeName, InstantDemoGoalId, XConnectUrl, Thumbprint);
+			var definition = await referenceDataManager.GetDefinition(configuration.GoalTypeName, configuration.InstantDemoGoalId, configuration.XConnectUrl, configuration.Thumbprint);
 			if (definition == null)
 			{
-				definition = await referenceDataManager.CreateDefinition(GoalTypeName, InstantDemoGoalId, InstantDemoGoalName, XConnectUrl, Thumbprint);
+				definition = await referenceDataManager.CreateDefinition(configuration.GoalTypeName, configuration.InstantDemoGoalId, configuration.InstantDemoGoalName, configuration.XConnectUrl, configuration.Thumbprint);
 			}
 
 
@@ -137,8 +96,8 @@ namespace Sitecore.TechnicalMarketing.xConnectTutorial
 			 * TUTORIAL: Search Interactions
 			 */
 			//Find all interactions created in a specific date range. Note that dates are required in UTC or local time
-			var startDate = new DateTime(SearchYear, SearchMonth, SearchStartDay).ToUniversalTime();
-			var endDate = startDate.AddDays(SearchDays);
+			var startDate = new DateTime(configuration.SearchYear, configuration.SearchMonth, configuration.SearchStartDay).ToUniversalTime();
+			var endDate = startDate.AddDays(configuration.SearchDays);
 			var interactions = await interactionManager.SearchInteractionsByDate(cfg, startDate, endDate);
 
 

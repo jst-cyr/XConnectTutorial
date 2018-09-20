@@ -68,9 +68,11 @@ namespace Sitecore.TechnicalMarketing.xConnectTutorial
 						@" \$$   \$$  \$$$$$$   \$$$$$$  \$$   \$$ \$$   \$$  \$$$$$$$  \$$$$$$$    \$$$$ "
 					};
 			Console.WindowWidth = 160;
-			foreach (string line in arr)
-				Console.WriteLine(line);
-		}
+			foreach (var line in arr)
+            {
+                Console.WriteLine(line);
+            }
+        }
 
 		/// <summary>
 		/// Method for outputting a list of operation results
@@ -141,7 +143,7 @@ namespace Sitecore.TechnicalMarketing.xConnectTutorial
 			Console.WriteLine("Contact ID: {0}", contact.Id.ToString());
 			Console.ForegroundColor = ConsoleColor.White;
 
-			PersonalInformation personalInfoFacet = contact.GetFacet<PersonalInformation>(PersonalInformation.DefaultFacetKey);
+			var personalInfoFacet = contact.GetFacet<PersonalInformation>(PersonalInformation.DefaultFacetKey);
 			if (personalInfoFacet != null)
 			{
 				Console.WriteLine(" > Contact Name: {0} {1}", personalInfoFacet.FirstName, personalInfoFacet.LastName);
@@ -150,16 +152,15 @@ namespace Sitecore.TechnicalMarketing.xConnectTutorial
 			}
 
 			//Write out interaction data
-			if (contact.Interactions != null)
-			{
-				Console.WriteLine(" > Interactions:");
-				foreach (var interaction in contact.Interactions)
-				{
-					Console.WriteLine(" >> Interaction ID: {0}", interaction.Id);
-					Console.WriteLine(" >>> Start: {0} to End: {1}", interaction.StartDateTime, interaction.EndDateTime);
-					Console.WriteLine(" >>> Channel ID: {0}", interaction.ChannelId);
-				}
-			}
+		    if (contact.Interactions == null) return;
+
+		    Console.WriteLine(" > Interactions:");
+		    foreach (var interaction in contact.Interactions)
+		    {
+		        Console.WriteLine(" >> Interaction ID: {0}", interaction.Id);
+		        Console.WriteLine(" >>> Start: {0} to End: {1}", interaction.StartDateTime, interaction.EndDateTime);
+		        Console.WriteLine(" >>> Channel ID: {0}", interaction.ChannelId);
+		    }
 		}
 	}
 }

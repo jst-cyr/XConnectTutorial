@@ -6,7 +6,7 @@ Based on code from @Martina Wehlander in the "Getting Started" tutorials: https:
 ## Getting Started
 **Program.cs** kicks off the console program and delegates to many other classes which contain the examples of how to interact with the APIs.
 
-In this class, you'll want to configure the following:
+Modify the following configuration values in the app.config file:
 
  - **Thumbprint**: This is the Thumbprint for your xConnect certificate, as found in your xConnect configuration files.
  - **XConnectUrl**: This is the URL to your xConnect instance. This code base assumes a single endpoint for all services, but you can extend the program to use different endpoints easily.

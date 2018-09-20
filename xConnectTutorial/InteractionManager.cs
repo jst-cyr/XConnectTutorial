@@ -4,15 +4,14 @@ using Sitecore.XConnect.Collection.Model;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace Sitecore.TechnicalMarketing.xConnectTutorial
 {
-	/// <summary>
-	/// This class shows an example of working with interaction objects and the xConnect API
-	/// </summary>
-	public class InteractionManager
+    /// <summary>
+    /// This class shows an example of working with interaction objects and the xConnect API
+    /// </summary>
+    public class InteractionManager
 	{
 		public OutputHandler Logger { get; set; }
 
@@ -33,7 +32,7 @@ namespace Sitecore.TechnicalMarketing.xConnectTutorial
 				try
 				{
 					//Instantiate the interaction details
-					Interaction interaction = new Interaction(contact, InteractionInitiator.Brand, Guid.Parse(channelId), "");
+					var interaction = new Interaction(contact, InteractionInitiator.Brand, Guid.Parse(channelId), "");
 
 					//Create the event - all interactions must have at least one event
 					var xConnectEvent = new Goal(Guid.Parse(goalId), DateTime.UtcNow);
