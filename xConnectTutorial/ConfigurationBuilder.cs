@@ -52,13 +52,13 @@ namespace Sitecore.TechnicalMarketing.xConnectTutorial
 		/// </summary>
 		/// <param name="thumbprint"></param>
 		/// <returns></returns>
-		public virtual IEnumerable<IHttpClientModifier> GetReferenceDataHandlers(string thumbprint)
+		public virtual IEnumerable<IHttpClientHandlerModifier> GetReferenceDataHandlers(string thumbprint)
 		{
 			// Valid certificate thumbprints must be passed in
 			var options = CertificateHttpClientHandlerModifierOptions.Parse("StoreName=My;StoreLocation=LocalMachine;FindType=FindByThumbprint;FindValue=" + thumbprint);
 
 			// Optional timeout modifier
-			IHttpClientModifier[] handlers = { (IHttpClientModifier)new CertificateHttpClientHandlerModifier(options) };
+			IHttpClientHandlerModifier[] handlers = { new CertificateHttpClientHandlerModifier(options) };
 
 			return handlers;
 		}
