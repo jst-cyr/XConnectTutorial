@@ -25,11 +25,11 @@ namespace Sitecore.TechnicalMarketing.xConnectTutorial
 		public virtual XConnectClientConfiguration GetClientConfiguration(string collectionHost, string searchHost, string configHost, string thumbprint)
 		{
 			//Set up the certificate used to connect to xConnect endpoints
-			var options = CertificateWebRequestHandlerModifierOptions.Parse("StoreName=My;StoreLocation=LocalMachine;FindType=FindByThumbprint;FindValue=" + thumbprint);
-			var certificateModifier = new CertificateWebRequestHandlerModifier(options);
+			var options = CertificateHttpClientHandlerModifierOptions.Parse("StoreName=My;StoreLocation=LocalMachine;FindType=FindByThumbprint;FindValue=" + thumbprint);
+			var certificateModifier = new CertificateHttpClientHandlerModifier(options);
 
-            //Set up timeout modifier for the client
-		    var timeoutClientModifier = new TimeoutHttpClientModifier(new TimeSpan(0, 0, 20));
+			//Set up timeout modifier for the client
+			var timeoutClientModifier = new TimeoutHttpClientModifier(new TimeSpan(0, 0, 20));
             var clientModifiers = new List<IHttpClientModifier>
             {
                 timeoutClientModifier
@@ -52,13 +52,13 @@ namespace Sitecore.TechnicalMarketing.xConnectTutorial
 		/// </summary>
 		/// <param name="thumbprint"></param>
 		/// <returns></returns>
-		public virtual IWebRequestHandlerModifier[] GetReferenceDataHandlers(string thumbprint)
+		public virtual IEnumerable<IHttpClientModifier> GetReferenceDataHandlers(string thumbprint)
 		{
 			// Valid certificate thumbprints must be passed in
-			var options = CertificateWebRequestHandlerModifierOptions.Parse("StoreName=My;StoreLocation=LocalMachine;FindType=FindByThumbprint;FindValue=" + thumbprint);
+			var options = CertificateHttpClientHandlerModifierOptions.Parse("StoreName=My;StoreLocation=LocalMachine;FindType=FindByThumbprint;FindValue=" + thumbprint);
 
 			// Optional timeout modifier
-			IWebRequestHandlerModifier[] handlers = { new CertificateWebRequestHandlerModifier(options) };
+			IHttpClientModifier[] handlers = { (IHttpClientModifier)new CertificateHttpClientHandlerModifier(options) };
 
 			return handlers;
 		}
