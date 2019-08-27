@@ -3,6 +3,11 @@ A tutorial repository based on the Sitecore documentation to walk users through 
 
 Based on code from @Martina Wehlander in the "Getting Started" tutorials: https://doc.sitecore.net/developers/xp/getting-started/#tutorials-xconnect
 
+## Version support
+**Latest version:** Sitecore XP 9.2.0
+**Available releases:** v9.0.2
+
+
 ## Getting Started
 **Program.cs** kicks off the console program and delegates to many other classes which contain the examples of how to interact with the APIs.
 
