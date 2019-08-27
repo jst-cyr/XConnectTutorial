@@ -195,6 +195,7 @@ namespace Sitecore.TechnicalMarketing.xConnectTutorial
 				}
 
 				//Output information about the updated contact
+				Logger.WriteLine("Updated contact information:");
 				Logger.WriteContact(existingContact);
 			}
 			else
