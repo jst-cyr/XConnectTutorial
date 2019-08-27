@@ -68,6 +68,16 @@ namespace Sitecore.TechnicalMarketing.xConnectTutorial
 			//Retrieve a contact that was created
 			var contact = await contactManager.GetContact(cfg, twitterId);
 
+			/**
+			 * TUTORIAL: Update an existing contact
+			*/
+			//Update the personal information about a Contact
+			PersonalInformation updatedPersonalInformation = new PersonalInformation()
+			{
+				JobTitle = "Senior Programmer Writer"
+			};
+			var updatedContact = await contactManager.UpdateContact(cfg, twitterId, updatedPersonalInformation);
+
 
 			/**
 			 * TUTORIAL: Register a goal for the created contact
@@ -109,16 +119,6 @@ namespace Sitecore.TechnicalMarketing.xConnectTutorial
 			if (interactionResult != null && interactionResult.Contact != null && interactionResult.Contact.Id.HasValue && interactionResult.Id.HasValue) {
 				var triggeredGoal = await interactionManager.GetInteraction(cfg, interactionResult.Contact.Id.Value, interactionResult.Id.Value);
 			}
-
-			/**
-			 * TUTORIAL: Update an existing contact
-			 */
-			//Update the personal information about a Contact
-			PersonalInformation updatedPersonalInformation = new PersonalInformation()
-			{
-				JobTitle = "Senior Programmer Writer"
-			};
-			var updatedContact = await contactManager.UpdateContact(cfg, twitterId, updatedPersonalInformation);
 		}
 	}
 }
