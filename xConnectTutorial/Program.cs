@@ -91,7 +91,6 @@ namespace Sitecore.TechnicalMarketing.xConnectTutorial
 			//Get a contact with the interactions
 			contact = await contactManager.GetContactWithInteractions(cfg, twitterId, DateTime.MinValue, DateTime.MaxValue);
 
-
 			/**
 			 * TUTORIAL: Search Interactions
 			 */
@@ -110,6 +109,16 @@ namespace Sitecore.TechnicalMarketing.xConnectTutorial
 			if (interactionResult != null && interactionResult.Contact != null && interactionResult.Contact.Id.HasValue && interactionResult.Id.HasValue) {
 				var triggeredGoal = await interactionManager.GetInteraction(cfg, interactionResult.Contact.Id.Value, interactionResult.Id.Value);
 			}
+
+			/**
+			 * TUTORIAL: Update an existing contact
+			 */
+			//Update the personal information about a Contact
+			PersonalInformation updatedPersonalInformation = new PersonalInformation()
+			{
+				JobTitle = "Senior Programmer Writer"
+			};
+			var updatedContact = await contactManager.UpdateContact(cfg, twitterId, updatedPersonalInformation);
 		}
 	}
 }

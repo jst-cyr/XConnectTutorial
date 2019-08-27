@@ -51,6 +51,7 @@
     <Compile Include="Configuration.cs" />
     <Compile Include="ConfigurationBuilder.cs" />
     <Compile Include="ContactManager.cs" />
+    <Compile Include="Extensions\PersonalInformation.cs" />
     <Compile Include="InteractionManager.cs" />
     <Compile Include="OutputHandler.cs" />
     <Compile Include="Program.cs" />

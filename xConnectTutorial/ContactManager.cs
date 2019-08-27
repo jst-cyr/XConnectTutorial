@@ -1,6 +1,7 @@
 ﻿using Sitecore.XConnect;
 using Sitecore.XConnect.Client;
 using Sitecore.XConnect.Collection.Model;
+using Sitecore.TechnicalMarketing.xConnectTutorial.Extensions;
 using System;
 using System.Threading.Tasks;
 
@@ -124,6 +125,58 @@ namespace Sitecore.TechnicalMarketing.xConnectTutorial
 					Logger.WriteError("Exception retrieving contact", ex);
 				}
 			}
+
+			return existingContact;
+		}
+
+		/// <summary>
+		/// Given an existing identifier and new personal information, find the contact and update the facet
+		/// </summary>
+		/// <param name="cfg">The configuration to use to load the Contact</param>
+		/// <param name="twitterId">The identifier for the contact</param>
+		/// <param name="updatedPersonalInformation">The new information to store</param>
+		/// <returns></returns>
+		public virtual async Task<Contact> UpdateContact(XConnectClientConfiguration cfg, string twitterId, PersonalInformation updatedPersonalInformation)
+		{
+			//If no updated information was provided, we can shortcut exit and save the connections
+			if (updatedPersonalInformation == null)
+				return null;
+
+			//Get the existing contact that we want to update
+			var existingContact = await GetContact(cfg, twitterId);
+
+			if(existingContact != null)
+			{
+				//Get the existing personal information that needs to be updated
+				var personalInfoFacet = existingContact.GetFacet<PersonalInformation>(PersonalInformation.DefaultFacetKey);
+				if(personalInfoFacet != null)
+				{
+					//Check for any changes. No need to send updates if it is the same!
+					bool hasFacetChanged = personalInfoFacet.HasChanged(updatedPersonalInformation);
+
+					//If any change has occurred, make the update
+					if (hasFacetChanged)
+					{
+						//Update the current facet data with the new pieces
+						personalInfoFacet.Update(updatedPersonalInformation);
+
+						//Open a client connection and make the update
+						using (var client = new XConnectClient(cfg))
+						{
+							client.SetFacet<PersonalInformation>(existingContact, PersonalInformation.DefaultFacetKey, personalInfoFacet);
+						}
+					}
+				}
+				else
+				{
+					//If there is no personal information facet, we need to send all the data
+					using (var client = new XConnectClient(cfg))
+					{
+						client.SetFacet<PersonalInformation>(existingContact, PersonalInformation.DefaultFacetKey, updatedPersonalInformation);
+					}
+				}
+			}
+
 
 			return existingContact;
 		}
