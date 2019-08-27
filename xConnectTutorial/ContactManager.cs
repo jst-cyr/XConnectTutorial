@@ -138,6 +138,8 @@ namespace Sitecore.TechnicalMarketing.xConnectTutorial
 		/// <returns></returns>
 		public virtual async Task<Contact> UpdateContact(XConnectClientConfiguration cfg, string twitterId, PersonalInformation updatedPersonalInformation)
 		{
+			Logger.WriteLine("Updating personal information about Contact with Identifier:" + twitterId);
+
 			//If no updated information was provided, we can shortcut exit and save the connections
 			if (updatedPersonalInformation == null)
 				return null;
@@ -154,7 +156,7 @@ namespace Sitecore.TechnicalMarketing.xConnectTutorial
 					//Check for any changes. No need to send updates if it is the same!
 					bool hasFacetChanged = personalInfoFacet.HasChanged(updatedPersonalInformation);
 
-					//If any change has occurred, make the update
+					//If any change has occurred, make the update.
 					if (hasFacetChanged)
 					{
 						//Update the current facet data with the new pieces
@@ -163,7 +165,13 @@ namespace Sitecore.TechnicalMarketing.xConnectTutorial
 						//Open a client connection and make the update
 						using (var client = new XConnectClient(cfg))
 						{
-							client.SetFacet<PersonalInformation>(existingContact, PersonalInformation.DefaultFacetKey, personalInfoFacet);
+							try { 
+								client.SetFacet<PersonalInformation>(existingContact, PersonalInformation.DefaultFacetKey, personalInfoFacet);
+							}
+							catch (XdbExecutionException ex)
+							{
+								Logger.WriteError("Exception updating personal information", ex);
+							}
 						}
 					}
 				}
@@ -172,11 +180,27 @@ namespace Sitecore.TechnicalMarketing.xConnectTutorial
 					//If there is no personal information facet, we need to send all the data
 					using (var client = new XConnectClient(cfg))
 					{
-						client.SetFacet<PersonalInformation>(existingContact, PersonalInformation.DefaultFacetKey, updatedPersonalInformation);
+						try
+						{
+							client.SetFacet<PersonalInformation>(existingContact, PersonalInformation.DefaultFacetKey, updatedPersonalInformation);
+						}
+						catch (XdbExecutionException ex)
+						{
+							Logger.WriteError("Exception creating personal information for the Contact", ex);
+						}
 					}
-				}
-			}
 
+					//Update the current facet data with the new pieces
+					personalInfoFacet = updatedPersonalInformation;
+				}
+
+				//Output information about the updated contact
+				Logger.WriteContact(existingContact);
+			}
+			else
+			{
+				Logger.WriteLine("WARNING: No Contact found with Identifier:" + twitterId + ". Cannot update personal information.");
+			}
 
 			return existingContact;
 		}
