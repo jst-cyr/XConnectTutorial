@@ -205,5 +205,42 @@ namespace Sitecore.TechnicalMarketing.xConnectTutorial
 
 			return existingContact;
 		}
+
+		/// <summary>
+		/// Given an existing identifier, find and delete the Contact
+		/// </summary>
+		/// <param name="cfg">The configuration to use to load the Contact</param>
+		/// <param name="twitterId">The identifier for the contact</param>
+		public virtual async Task<Contact> DeleteContact(XConnectClientConfiguration cfg, string twitterId)
+		{
+			Logger.WriteLine("Deleting Contact with Identifier:" + twitterId);
+
+			//Get the existing contact that we want to update
+			var existingContact = await GetContact(cfg, twitterId);
+			if(existingContact != null)
+			{
+				//If there is no personal information facet, we need to send all the data
+				using (var client = new XConnectClient(cfg))
+				{
+					try
+					{
+						var result = client.DeleteContact(existingContact);
+						await client.SubmitAsync();
+
+						Logger.WriteLine(">> Contact successfully deleted.");
+					}
+					catch (XdbExecutionException ex)
+					{
+						Logger.WriteError("Exception deleting the Contact", ex);
+					}
+				}
+			}
+			else
+			{
+				Logger.WriteLine("WARNING: No Contact found with Identifier:" + twitterId + ". Cannot delete Contact.");
+			}
+
+			return existingContact;
+		}
 	}
 }

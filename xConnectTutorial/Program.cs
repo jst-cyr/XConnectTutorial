@@ -119,6 +119,11 @@ namespace Sitecore.TechnicalMarketing.xConnectTutorial
 			if (interactionResult != null && interactionResult.Contact != null && interactionResult.Contact.Id.HasValue && interactionResult.Id.HasValue) {
 				var triggeredGoal = await interactionManager.GetInteraction(cfg, interactionResult.Contact.Id.Value, interactionResult.Id.Value);
 			}
+
+			/**
+			 * TUTORIAL: Delete a Contact from the database
+			 */
+			var deletedContact = await contactManager.DeleteContact(cfg, twitterId);
 		}
 	}
 }
