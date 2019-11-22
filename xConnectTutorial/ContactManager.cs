@@ -224,7 +224,7 @@ namespace Sitecore.TechnicalMarketing.xConnectTutorial
 				{
 					try
 					{
-						var result = client.DeleteContact(existingContact);
+						client.DeleteContact(existingContact);
 						await client.SubmitAsync();
 
 						Logger.WriteLine(">> Contact successfully deleted.");
