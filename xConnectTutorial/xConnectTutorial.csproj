@@ -50,6 +50,7 @@
   <ItemGroup>
     <Compile Include="Configuration.cs" />
     <Compile Include="ConfigurationBuilder.cs" />
+    <Compile Include="SearchContactsTutorial.cs" />
     <Compile Include="ContactManager.cs" />
     <Compile Include="Extensions\PersonalInformation.cs" />
     <Compile Include="InteractionManager.cs" />

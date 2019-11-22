@@ -34,7 +34,9 @@ namespace Sitecore.TechnicalMarketing.xConnectTutorial
 			var interactionManager = new InteractionManager() { Logger = outputHandler };
 			var contactManager = new ContactManager() { Logger = outputHandler };
 			var referenceDataManager = new ReferenceDataManager() { Logger = outputHandler };
-            var configuration = new Configuration();
+			var searchContactsTutorial = new SearchContactsTutorial(){ Logger = outputHandler };
+
+			var configuration = new Configuration();
             //Initialize IP information which will be used for tracking events.
             var ipInfo = new IpInfo("127.0.0.1") {BusinessName = "Home"};
 
@@ -121,9 +123,16 @@ namespace Sitecore.TechnicalMarketing.xConnectTutorial
 			}
 
 			/**
-			 * TUTORIAL: Delete a Contact from the database
+			 * TUTORIAL: Delete a single Contact from the database
 			 */
 			var deletedContact = await contactManager.DeleteContact(cfg, twitterId);
+
+
+			/**
+			 * TUTORIAL: Find all contacts with no interactions since the configured search period. Then delete these inactive Contacts!
+			 */
+			var expiredContacts = searchContactsTutorial.GetContactIdsByLastActivity(cfg, endDate);
+
 		}
 	}
 }
