@@ -23,10 +23,14 @@ namespace Sitecore.TechnicalMarketing.xConnectTutorial
 		/// <param name="channelId">The channel to create an interaction on</param>
 		/// <param name="goalId">The ID of the goal for the interaction event</param>
 		/// <param name="ipInfo">The ip address the goal was triggered from</param>
+		/// <param name="eventTime">(Optional) The time the interaction occurred. If not provided, defaults to Null and DateTime.UtcNow will be used for the interaction</param>
 		/// <returns></returns>
-		public virtual async Task<Interaction> RegisterGoalInteraction(XConnectClientConfiguration cfg, Contact contact, string channelId, string goalId, IpInfo ipInfo)
+		public virtual async Task<Interaction> RegisterGoalInteraction(XConnectClientConfiguration cfg, Contact contact, string channelId, string goalId, IpInfo ipInfo, DateTime? eventTime = null)
 		{
-			Logger.WriteLine("Creating interaction for contact with ID: '{0}'. Channel: '{1}'. Goal: '{2}'", contact.Id, channelId, goalId);
+			//Determine what time stamp to put on the interaction
+			var interactionTimestamp = eventTime.HasValue ? eventTime.Value : DateTime.UtcNow;
+			Logger.WriteLine("Creating interaction for contact with ID: '{0}'. Channel: '{1}'. Goal: '{2}'. Time: '{3}'", contact.Id, channelId, goalId, interactionTimestamp);
+
 			using (var client = new XConnectClient(cfg))
 			{
 				try
@@ -35,7 +39,7 @@ namespace Sitecore.TechnicalMarketing.xConnectTutorial
 					var interaction = new Interaction(contact, InteractionInitiator.Brand, Guid.Parse(channelId), "");
 
 					//Create the event - all interactions must have at least one event
-					var xConnectEvent = new Goal(Guid.Parse(goalId), DateTime.UtcNow);
+					var xConnectEvent = new Goal(Guid.Parse(goalId), interactionTimestamp);
 					interaction.Events.Add(xConnectEvent);
 
 					//Add in IP information for where the goal was triggered from
