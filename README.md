@@ -1,7 +1,7 @@
 # XConnectTutorial
-A tutorial repository based on the Sitecore documentation to walk users through common interactions with the APIs.
+A tutorial repository based on the Sitecore documentation to walk users through common interactions with the xConnect APIs.
 
-Based on code from @Martina Wehlander in the "Getting Started" tutorials: https://doc.sitecore.net/developers/xp/getting-started/#tutorials-xconnect
+Based on code from @Martina Wehlander in the "Getting Started" tutorials and other great documentation: https://doc.sitecore.net/developers/xp/getting-started/#tutorials-xconnect
 
 ## Version support
 **Latest version:** Sitecore XP 9.2.0
@@ -22,3 +22,14 @@ Modify the following configuration values in the app.config file:
  - **SearchDays**: This is the number of days to search for when searching interactions.
  
 From here you can start the console app from within Visual Studio and you should be able to step through the various examples and see output in the console window with results.
+
+## The Tutorials
+1. **Building the configuration for connecting to xConnect**: This shows a class that could be used to quickly build up the object you need for instantiating all xConnect client calls.
+2. **Create and Retrieve a contact**: In this code sample, you see how to create a single new Contact and then retrieve that Contact using the identifier.
+3. **Update an existing contact**: In this code sample, we find a Contact by their identifier and then update some personal information on the facet and save it back to xConnect.
+4. **Register a goal**: This is a code sample for creating a new interaction for a specified Contact. In this tutorial a brand new goal is registered for the Contact we have created.
+5. **Reference Data Manager**: In this sample we show how to use the reference data manager to extract the definition of a goal, and if it is not there, create the definition.
+6. **Get the Contact with it's interactions**: The code in this sample is similar to loading a single contact, but now permits adding date time bounds to search for associated interactions that can be loaded with the Contact. In this case, we load the new registered goal when loading the created Contact.
+7. **Search Interactions**: Instead of loading a contact, this searches the interactions collection and finds all interactions within the configured search date span.
+8. **Expanding an interaction search result**: In this example, we show taking a search result and then querying xConnect to get the full details of the registered goal based on the information on the search result.
+9. **Delete a single Contact**: Showcasing the Delete API introduced in 9.2, this sample deletes our new Contact and all the interactions created so far.
