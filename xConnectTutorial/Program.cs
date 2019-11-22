@@ -129,9 +129,9 @@ namespace Sitecore.TechnicalMarketing.xConnectTutorial
 
 
 			/**
-			 * TUTORIAL: Find all contacts with no interactions since the configured search period. Then delete these inactive Contacts!
+			 * TUTORIAL: Create a batch of Contacts with old interactions, then find all contacts with no interactions since the configured search period. Then delete these inactive Contacts!
 			 */
-			var expiredContacts = searchContactsTutorial.GetContactIdsByLastActivity(cfg, endDate);
+			var expiredContacts = await searchContactsTutorial.GetContactIdsByLastActivity(cfg, endDate);
 
 		}
 	}
