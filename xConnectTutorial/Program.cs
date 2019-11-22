@@ -1,5 +1,7 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
+using Sitecore.XConnect;
 using Sitecore.XConnect.Client;
 using Sitecore.XConnect.Collection.Model;
 using System.Linq;
@@ -34,7 +36,7 @@ namespace Sitecore.TechnicalMarketing.xConnectTutorial
 			var interactionManager = new InteractionManager() { Logger = outputHandler };
 			var contactManager = new ContactManager() { Logger = outputHandler };
 			var referenceDataManager = new ReferenceDataManager() { Logger = outputHandler };
-			var searchContactsTutorial = new SearchContactsTutorial(){ Logger = outputHandler };
+			
 
 			var configuration = new Configuration();
             //Initialize IP information which will be used for tracking events.
@@ -131,8 +133,45 @@ namespace Sitecore.TechnicalMarketing.xConnectTutorial
 			/**
 			 * TUTORIAL: Create a batch of Contacts with old interactions, then find all contacts with no interactions since the configured search period. Then delete these inactive Contacts!
 			 */
-			var expiredContacts = await searchContactsTutorial.GetContactIdsByLastActivity(cfg, endDate);
+			await DeletingMultipleContactsTutorial(cfg);
+		}
 
+
+		/// <summary>
+		/// Create a batch of Contacts with old interactions, then find all contacts with no interactions since the configured search period. Then delete these inactive Contacts!
+		/// NOTE: This is not optimized for performance. This is built to showcase independent steps and pull together multiple lessons on working with multiple Contact records.
+		/// </summary>
+		/// <param name="cfg">The configuration used to open connections to xConnect</param>
+		public static async Task DeletingMultipleContactsTutorial(XConnectClientConfiguration cfg)
+		{
+			//Initialize required handlers
+			var configuration = new Configuration();
+			var outputHandler = new OutputHandler();
+			var interactionManager = new InteractionManager() { Logger = outputHandler };
+			var contactManager = new ContactManager() { Logger = outputHandler };
+			var searchContactsTutorial = new SearchContactsTutorial() { Logger = outputHandler };
+
+			//PART 1: Generate the list of 5 contact twitter IDs and then create the Contacts in one call to xConnect
+			var generatedTwitterIds = new List<string>()
+			{
+				configuration.TwitterIdentifier + Guid.NewGuid().ToString("N"),
+				configuration.TwitterIdentifier + Guid.NewGuid().ToString("N"),
+				configuration.TwitterIdentifier + Guid.NewGuid().ToString("N"),
+				configuration.TwitterIdentifier + Guid.NewGuid().ToString("N"),
+				configuration.TwitterIdentifier + Guid.NewGuid().ToString("N")
+			};
+			var contactIdentifiers = await contactManager.CreateMultipleContacts(cfg, generatedTwitterIds);
+
+			//PART 2: Find all contacts that have no interactions since the specified end date
+			var startDate = new DateTime(configuration.SearchYear, configuration.SearchMonth, configuration.SearchStartDay).ToUniversalTime();
+			var endDate = startDate.AddDays(configuration.SearchDays);
+			var expiredContactIds = await searchContactsTutorial.GetContactIdsByLastActivity(cfg, endDate);
+
+			//PART 3: Load Contact details for all matching Contacts
+			var expiredContacts = await contactManager.GetMultipleContacts(cfg, expiredContactIds);
+
+			//PART 4: Delete all contacts identified
+			await contactManager.DeleteMultipleContacts(cfg, expiredContacts);
 		}
 	}
 }

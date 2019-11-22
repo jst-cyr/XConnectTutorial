@@ -3,6 +3,7 @@ using Sitecore.XConnect.Client;
 using Sitecore.XConnect.Collection.Model;
 using Sitecore.TechnicalMarketing.xConnectTutorial.Extensions;
 using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 
 namespace Sitecore.TechnicalMarketing.xConnectTutorial
@@ -27,8 +28,6 @@ namespace Sitecore.TechnicalMarketing.xConnectTutorial
 
 			// Print out the identifier that is going to be used
 			Logger.WriteLine("Creating Contact with Identifier:" + identifier.Identifier);
-
-
 
             // Initialize a client using the validated configuration
             using (var client = new XConnectClient(cfg))
@@ -62,6 +61,67 @@ namespace Sitecore.TechnicalMarketing.xConnectTutorial
             }
 
             return identifier;
+		}
+
+		/// <summary>
+		/// Create a contact
+		/// </summary>
+		/// <param name="cfg">The client configuration for connecting</param>
+		/// <param name="twitterIdentifiers">The list of identifiers for each contact</param>'
+		public virtual async Task<List<ContactIdentifier>> CreateMultipleContacts(XConnectClientConfiguration cfg, List<string> twitterIdentifiers)
+		{
+			//Ensure collection is non-null
+			if(twitterIdentifiers == null)
+			{
+				twitterIdentifiers = new List<string>();
+			}
+
+			// Print out the identifier that is going to be used
+			Logger.WriteLine("Creating Multiple Contacts [{0}]", twitterIdentifiers.Count);
+
+			//Build up the list of ContactIdentifiers that will be used
+			List<ContactIdentifier> contactIdentifiers = new List<ContactIdentifier>();
+			foreach(var twitterId in twitterIdentifiers)
+			{
+				var identifier = new ContactIdentifier("twitter", twitterId, ContactIdentifierType.Known);
+				contactIdentifiers.Add(identifier);
+			}
+			
+			// Initialize a client using the validated configuration
+			using (var client = new XConnectClient(cfg))
+			{
+				try
+				{
+					//Create all the contact objects and add to the client
+					foreach(var contactIdentifier in contactIdentifiers)
+					{
+						// Create a new contact object from the identifier
+						var knownContact = new Contact(new ContactIdentifier[] { contactIdentifier });
+
+						//Add personal information
+						var personalInfoFacet = new PersonalInformation() { FirstName = "Myrtle", LastName = contactIdentifier.Identifier, JobTitle = "Programmer Writer", Birthdate = DateTime.Now.Date };
+
+						//Set the personal info on the contact
+						client.SetFacet<PersonalInformation>(knownContact, PersonalInformation.DefaultFacetKey, personalInfoFacet);
+
+						//Add to the client
+						client.AddContact(knownContact);
+					}
+
+					// Submit contact
+					await client.SubmitAsync();
+
+					// Get the last batch that was executed
+					Logger.WriteOperations(client.LastBatch);
+				}
+				catch (XdbExecutionException ex)
+				{
+					// Deal with exception
+					Logger.WriteError("Exception creating contacts", ex);
+				}
+			}
+
+			return contactIdentifiers;
 		}
 
 		/// <summary>
@@ -127,6 +187,59 @@ namespace Sitecore.TechnicalMarketing.xConnectTutorial
 			}
 
 			return existingContact;
+		}
+
+		/// <summary>
+		/// Retrieves the Contacts from xConnect for each matching contactID
+		/// </summary>
+		/// <param name="cfg">The configuration to use to open connections to xConnect</param>
+		/// <param name="contactIds">The list of contacts to retrieve</param>
+		/// <returns></returns>
+		public virtual async Task<List<Contact>> GetMultipleContacts(XConnectClientConfiguration cfg, List<Guid> contactIds)
+		{
+			if (contactIds == null) { contactIds = new List<Guid>(); }
+			Logger.WriteLine("Getting Multiple Contacts: [{0}]", contactIds.Count);
+
+			var contacts = new List<Contact>();
+
+			// Initialize a client using the validated configuration
+			using (var client = new XConnectClient(cfg))
+			{
+				try
+				{
+					//Configure the options to extract the personal information facet
+					var contactOptions = new ContactExpandOptions(new string[] { PersonalInformation.DefaultFacetKey });
+
+					//Get a list of reference objects for the contactIds provided
+					var references = new List<IEntityReference<Contact>>();
+					foreach (var contactId in contactIds) {
+						references.Add(new ContactReference(contactId));
+					}
+
+					//Get all the matches
+					var contactsResult = await client.GetAsync<Contact>(references, contactOptions);
+
+					//Get the Contact objects from the results
+					foreach(var result in contactsResult)
+					{
+						if (result.Exists)
+						{
+							contacts.Add(result.Entity);
+						}
+					}
+
+					//Output information about the contact list
+					if (client.LastBatch != null) { Logger.WriteOperations(client.LastBatch); }
+					Logger.WriteLine("> Retrieved {0} matching Contacts.", contacts.Count);
+				}
+				catch (XdbExecutionException ex)
+				{
+					// Deal with exception
+					Logger.WriteError("Exception retrieving contact", ex);
+				}
+			}
+
+			return contacts;
 		}
 
 		/// <summary>
@@ -241,6 +354,38 @@ namespace Sitecore.TechnicalMarketing.xConnectTutorial
 			}
 
 			return existingContact;
+		}
+
+		/// <summary>
+		/// Given a list of Contact GUIDs, delete all of them
+		/// </summary>
+		/// <param name="cfg">The configuration to use to load the Contact</param>
+		/// <param name="contacts">The contacts to delete</param>
+		public virtual async Task DeleteMultipleContacts(XConnectClientConfiguration cfg, List<Contact> contacts)
+		{
+			if(contacts == null) { contacts = new List<Contact>(); }
+			Logger.WriteLine("Deleting Multiple Contacts: [{0}]", contacts.Count);
+
+			using (var client = new XConnectClient(cfg))
+			{
+				try
+				{
+					//Add an operation to the task for each contact in the list
+					foreach(var contact in contacts)
+					{
+						client.DeleteContact(contact);
+					}
+						
+					await client.SubmitAsync();
+
+					if(client.LastBatch != null) { Logger.WriteOperations(client.LastBatch); }
+					Logger.WriteLine(">> {0} Contacts successfully deleted.", contacts.Count);
+				}
+				catch (XdbExecutionException ex)
+				{
+						Logger.WriteError("Exception deleting the Contacts", ex);
+				}
+			}
 		}
 	}
 }
