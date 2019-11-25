@@ -162,5 +162,43 @@ namespace Sitecore.TechnicalMarketing.xConnectTutorial
 		        Console.WriteLine(" >>> Channel ID: {0}", interaction.ChannelId);
 		    }
 		}
+
+		/// <summary>
+		/// This outputs something to the console to inform the user we are waiting
+		/// </summary>
+		/// <param name="waitSeconds">The number of seconds to wait</param>
+		/// <param name="waitReason">The information to show as to why the wait is happening</param>
+		public void WriteWaitMessage(int waitSeconds, string waitReason)
+		{
+			//Output the wait message
+			Console.ForegroundColor = ConsoleColor.DarkYellow;
+			Console.WriteLine("Waiting for {0} seconds. {1}", waitSeconds, waitReason);
+
+			Console.ForegroundColor = ConsoleColor.Yellow;
+
+			//Setup an array of characters for waiting animation
+			var waitCharacters = new String[]{"-", "\\", "|", "/" };
+
+			//Set up the total number of animations based on the milliseconds interval
+			var interval = 200;
+			var totalAnimations = waitSeconds * 1000 / interval;
+
+			//Each interval, update the animation
+			for(int i=0; i < totalAnimations; i++)
+			{
+				var waitCharacter = waitCharacters[i % waitCharacters.Length];
+				Console.SetCursorPosition(0, Console.CursorTop);
+				Console.Write(waitCharacter);
+				System.Threading.Thread.Sleep(interval);
+			}
+
+			//Remove the waiting character
+			Console.SetCursorPosition(0, Console.CursorTop);
+			Console.ForegroundColor = ConsoleColor.DarkYellow;
+			Console.WriteLine(" >> Waiting complete.");
+
+			//Reset color
+			Console.ForegroundColor = ConsoleColor.White;
+		}
 	}
 }

@@ -151,7 +151,8 @@ namespace Sitecore.TechnicalMarketing.xConnectTutorial
 			var contactManager = new ContactManager() { Logger = outputHandler };
 			var searchContactsTutorial = new SearchContactsTutorial() { Logger = outputHandler };
 
-			//PART 1: Generate the list of 5 contact twitter IDs and then create the Contacts in one call to xConnect
+			//PART 1: Generate the list of 5 contact twitter IDs and then create the Contacts in one call to xConnect.
+			// This shows you how to do a batch of operations. Note that while this example does all one type of Contact, you can mix anonymous and identified contacts in a single call.
 			var generatedTwitterIds = new List<string>()
 			{
 				configuration.TwitterIdentifier + Guid.NewGuid().ToString("N"),
@@ -163,14 +164,32 @@ namespace Sitecore.TechnicalMarketing.xConnectTutorial
 			var contactIdentifiers = await contactManager.CreateMultipleContacts(cfg, generatedTwitterIds);
 
 			//PART 2: Find all contacts that have no interactions since the specified end date
+			// This shows one example of using the search to find data that is 'old' or 'not relevant'. Note that this pulls from the index, hence needing to wait.
 			var startDate = new DateTime(configuration.SearchYear, configuration.SearchMonth, configuration.SearchStartDay).ToUniversalTime();
 			var endDate = startDate.AddDays(configuration.SearchDays);
-			var expiredContactIds = await searchContactsTutorial.GetContactIdsByLastActivity(cfg, endDate);
+			var expiredContactIds = new List<Guid>();
+
+			//WAITING: Because searching relies on the index, we need to be sure that we actually got the results we expected. 
+			//If the index hasn't updated yet, this call might return 'zero results' and then we wouldn't be able to delete the data.
+			//NOTE: Because this is a tutorial, I'm allowing the infinite loop because you can terminate the console, but you may want to limit the number of tries here.
+			while (expiredContactIds.Count < contactIdentifiers.Count)
+			{
+				expiredContactIds = await searchContactsTutorial.GetContactIdsByLastActivity(cfg, endDate);
+
+				//Add a wait if we didn't find anything
+				if(expiredContactIds.Count < contactIdentifiers.Count)
+				{
+					int waitSeconds = 3;
+					outputHandler.WriteWaitMessage(waitSeconds, "No results found in index. Waiting for index to update.");
+				}
+			}
 
 			//PART 3: Load Contact details for all matching Contacts
+			// This shows an example of retrieving the data about multiple contacts in a single call
 			var expiredContacts = await contactManager.GetMultipleContacts(cfg, expiredContactIds);
 
 			//PART 4: Delete all contacts identified
+			// This shows an example of using the Delete API but for a list of multiple specified contacts
 			await contactManager.DeleteMultipleContacts(cfg, expiredContacts);
 		}
 	}

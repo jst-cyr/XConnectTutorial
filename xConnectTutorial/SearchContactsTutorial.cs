@@ -43,7 +43,7 @@ namespace Sitecore.TechnicalMarketing.xConnectTutorial
 
 					//Create a queryable to search by the date
 					IAsyncQueryable<Contact> queryable = client.Contacts
-															.Where(c => c.Interactions.Any(x => x.StartDateTime < searchStartTime))
+															.Where(c => (!c.Interactions.Any()) || !c.Interactions.Any(x => x.StartDateTime > searchStartTime))
 															.WithExpandOptions(contactExpandOptions);
 
 					//Invoke the query
