@@ -328,15 +328,15 @@ namespace Sitecore.TechnicalMarketing.xConnectTutorial
 		{
 			Logger.WriteLine("Deleting Contact with Identifier:" + twitterId);
 
-			//Get the existing contact that we want to update
+			//Get the existing contact that we want to delete
 			var existingContact = await GetContact(cfg, twitterId);
 			if(existingContact != null)
 			{
-				//If there is no personal information facet, we need to send all the data
 				using (var client = new XConnectClient(cfg))
 				{
 					try
 					{
+						//Add the delete operation onto the client for the specified contact and execute
 						client.DeleteContact(existingContact);
 						await client.SubmitAsync();
 
