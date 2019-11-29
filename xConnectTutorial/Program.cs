@@ -82,7 +82,6 @@ namespace Sitecore.TechnicalMarketing.xConnectTutorial
 			var configuration = new Configuration();
 			var outputHandler = new OutputHandler();
 			var interactionManager = new InteractionManager() { Logger = outputHandler };
-			var contactManager = new ContactManager() { Logger = outputHandler };
 			var referenceDataManager = new ReferenceDataManager() { Logger = outputHandler };
 
 			/**
@@ -90,10 +89,12 @@ namespace Sitecore.TechnicalMarketing.xConnectTutorial
 			 */
 			//Create a contact
 			var twitterId = configuration.TwitterIdentifier + Guid.NewGuid().ToString("N");
-			var identifier = await contactManager.CreateContact(cfg, twitterId);
+			var contactCreator = new CreateContactTutorial() { Logger = outputHandler };
+			var identifier = await contactCreator.CreateContact(cfg, twitterId);
 
 			//Retrieve a contact that was created
-			var contact = await contactManager.GetContact(cfg, twitterId);
+			var contactLoader = new GetContactTutorial() { Logger = outputHandler };
+			var contact = await contactLoader.GetContact(cfg, twitterId);
 
 			/**
 			 * TUTORIAL: Update an existing contact
@@ -103,7 +104,8 @@ namespace Sitecore.TechnicalMarketing.xConnectTutorial
 			{
 				JobTitle = "Senior Programmer Writer"
 			};
-			var updatedContact = await contactManager.UpdateContact(cfg, twitterId, updatedPersonalInformation);
+			var contactUpdater = new UpdateContactTutorial() { Logger = outputHandler };
+			var updatedContact = await contactUpdater.UpdateContact(cfg, twitterId, updatedPersonalInformation);
 
 
 			/**
@@ -128,7 +130,7 @@ namespace Sitecore.TechnicalMarketing.xConnectTutorial
 			 * TUTORIAL: Get a contact with its list of interactions
 			 */
 			//Get a contact with the interactions
-			contact = await contactManager.GetContactWithInteractions(cfg, twitterId, DateTime.MinValue, DateTime.MaxValue);
+			contact = await contactLoader.GetContactWithInteractions(cfg, twitterId, DateTime.MinValue, DateTime.MaxValue);
 
 			/**
 			 * TUTORIAL: Search Interactions
@@ -153,7 +155,8 @@ namespace Sitecore.TechnicalMarketing.xConnectTutorial
 			/**
 			 * TUTORIAL: Delete a single Contact from the database
 			 */
-			var deletedContact = await contactManager.DeleteContact(cfg, twitterId);
+			var contactDeleter = new DeleteContactTutorial() { Logger = outputHandler };
+			var deletedContact = await contactDeleter.DeleteContact(cfg, twitterId);
 		}
 
 		/// <summary>
@@ -167,8 +170,8 @@ namespace Sitecore.TechnicalMarketing.xConnectTutorial
 			var configuration = new Configuration();
 			var outputHandler = new OutputHandler();
 			var interactionManager = new InteractionManager() { Logger = outputHandler };
-			var contactManager = new ContactManager() { Logger = outputHandler };
-			var searchContactsTutorial = new SearchContactsTutorial() { Logger = outputHandler };
+			
+			var searchContactsTutorial = new GetContactsByLastActivityTutorial() { Logger = outputHandler };
 
 			//PART 1: Generate the list of 5 contact twitter IDs and then create the Contacts in one call to xConnect.
 			// This shows you how to do a batch of operations. Note that while this example does all one type of Contact, you can mix anonymous and identified contacts in a single call.
@@ -180,7 +183,8 @@ namespace Sitecore.TechnicalMarketing.xConnectTutorial
 				configuration.TwitterIdentifier + Guid.NewGuid().ToString("N"),
 				configuration.TwitterIdentifier + Guid.NewGuid().ToString("N")
 			};
-			var contactIdentifiers = await contactManager.CreateMultipleContacts(cfg, generatedTwitterIds);
+			var contactsCreator = new CreateMultipleContactsTutorial() { Logger = outputHandler };
+			var contactIdentifiers = await contactsCreator.CreateMultipleContacts(cfg, generatedTwitterIds);
 
 			//PART 2: Find all contacts that have no interactions since the specified end date
 			// This shows one example of using the search to find data that is 'old' or 'not relevant'. Note that this pulls from the index, hence needing to wait.
@@ -205,11 +209,14 @@ namespace Sitecore.TechnicalMarketing.xConnectTutorial
 
 			//PART 3: Load Contact details for all matching Contacts
 			// This shows an example of retrieving the data about multiple contacts in a single call
-			var expiredContacts = await contactManager.GetMultipleContacts(cfg, expiredContactIds);
+			var contactsLoader = new GetMultipleContactsTutorial() { Logger = outputHandler };
+			var expiredContacts = await contactsLoader.GetMultipleContacts(cfg, expiredContactIds);
+
 
 			//PART 4: Delete all contacts identified
 			// This shows an example of using the Delete API but for a list of multiple specified contacts
-			await contactManager.DeleteMultipleContacts(cfg, expiredContacts);
+			var contactsDeleter = new DeleteMultipleContactsTutorial() { Logger = outputHandler };
+			await contactsDeleter.DeleteMultipleContacts(cfg, expiredContacts);
 		}
 	}
 }

@@ -50,8 +50,15 @@
   <ItemGroup>
     <Compile Include="Configuration.cs" />
     <Compile Include="ConfigurationBuilder.cs" />
-    <Compile Include="SearchContactsTutorial.cs" />
-    <Compile Include="ContactManager.cs" />
+    <Compile Include="Contacts\DeleteMultipleContactsTutorial.cs" />
+    <Compile Include="Contacts\DeleteContactTutorial.cs" />
+    <Compile Include="Contacts\UpdateContactTutorial.cs" />
+    <Compile Include="Contacts\GetMultipleContactsTutorial.cs" />
+    <Compile Include="Contacts\GetContactTutorial.cs" />
+    <Compile Include="Contacts\CreateMultipleContactsTutorial.cs" />
+    <Compile Include="Contacts\CreateContactTutorial.cs" />
+    <Compile Include="BaseTutorial.cs" />
+    <Compile Include="Search\GetContactsByLastActivityTutorial.cs" />
     <Compile Include="Extensions\PersonalInformation.cs" />
     <Compile Include="InteractionManager.cs" />
     <Compile Include="OutputHandler.cs" />

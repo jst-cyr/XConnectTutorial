@@ -8,9 +8,9 @@ using System.Threading.Tasks;
 namespace Sitecore.TechnicalMarketing.xConnectTutorial
 {
 	/// <summary>
-	/// This class shows examples of how to search Contacts
+	/// This class shows examples of how to search Contacts based on their last activity
 	/// </summary>
-	public class SearchContactsTutorial
+	public class GetContactsByLastActivityTutorial
 	{
 		public OutputHandler Logger { get; set; }
 
