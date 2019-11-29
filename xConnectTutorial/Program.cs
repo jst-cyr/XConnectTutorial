@@ -14,9 +14,6 @@ namespace Sitecore.TechnicalMarketing.xConnectTutorial
 	/// </summary>
 	internal class Program
 	{
-		
-
-
         
 		private static void Main(string[] args)
 		{
@@ -31,23 +28,15 @@ namespace Sitecore.TechnicalMarketing.xConnectTutorial
 
 		private static async Task MainAsync(string[] args)
 		{
-			//Initialize required handlers
-			var outputHandler = new OutputHandler();
-			var interactionManager = new InteractionManager() { Logger = outputHandler };
-			var contactManager = new ContactManager() { Logger = outputHandler };
-			var referenceDataManager = new ReferenceDataManager() { Logger = outputHandler };
-			
-
-			var configuration = new Configuration();
-            //Initialize IP information which will be used for tracking events.
-            var ipInfo = new IpInfo("127.0.0.1") {BusinessName = "Home"};
 
 			/**
 			 * TUTORIAL: Building the configuration used to connect to xConnect
 			 */
+			var configuration = new Configuration();
 			var cfg = new ConfigurationBuilder().GetClientConfiguration(configuration.XConnectUrl, configuration.XConnectUrl, configuration.XConnectUrl, configuration.Thumbprint);
-			
+
 			//Test configuration
+			var outputHandler = new OutputHandler();
 			try
 			{
 				await cfg.InitializeAsync();
@@ -61,6 +50,40 @@ namespace Sitecore.TechnicalMarketing.xConnectTutorial
 				return;
 			}
 
+			/**
+			 * TUTORIALS: Working with a single contact - Create, update, register interactions, search interactions, delete single Contact
+			 */
+			await SingleContactTutorials(cfg);
+
+
+			/**
+			 * TUTORIAL: Create a batch of Contacts with old interactions, then find all contacts with no interactions since the configured search period. Then delete these inactive Contacts!
+			 */
+			await DeletingMultipleContactsTutorial(cfg);
+		}
+
+
+		/// <summary>
+		/// This collection of single-contact tutorials shows how to use the API working with one Contact record.
+		/// TUTORIALS INCLUDED:
+		/// 1. Create and retrieve a Contact
+		/// 2. Update an existing Contact
+		/// 3. Register a goal (create an interaction) for an existing Contact
+		/// 4. Access the Reference Data Manager and also create an entry
+		/// 5. Retrieve a Contact with a full list of all its interactions
+		/// 6. Search the interactions index for interactions in a specific date range
+		/// 7. Take an interaction search result and expand it to get all the details
+		/// 8. Delete a single existing contact (the one created in the first tutorial)
+		/// </summary>
+		/// <param name="cfg">The configuration used to open connections to xConnect</param>
+		public static async Task SingleContactTutorials(XConnectClientConfiguration cfg)
+		{
+			//Initialize required handlers
+			var configuration = new Configuration();
+			var outputHandler = new OutputHandler();
+			var interactionManager = new InteractionManager() { Logger = outputHandler };
+			var contactManager = new ContactManager() { Logger = outputHandler };
+			var referenceDataManager = new ReferenceDataManager() { Logger = outputHandler };
 
 			/**
 			 * TUTORIAL: Create and retrieve a contact
@@ -86,6 +109,8 @@ namespace Sitecore.TechnicalMarketing.xConnectTutorial
 			/**
 			 * TUTORIAL: Register a goal for the created contact
 			 */
+			//Initialize IP information which will be used for tracking events.
+			var ipInfo = new IpInfo("127.0.0.1") { BusinessName = "Home" };
 			var interaction = await interactionManager.RegisterGoalInteraction(cfg, contact, configuration.OtherEventChannelId, configuration.InstantDemoGoalId, ipInfo);
 
 
@@ -120,7 +145,8 @@ namespace Sitecore.TechnicalMarketing.xConnectTutorial
 			//Look for the first result in the search results
 			var interactionResult = interactions != null ? interactions.LastOrDefault() : null;
 			//If the search result has sufficient contact and interaction ID data present, request the expanded details about the interaction
-			if (interactionResult != null && interactionResult.Contact != null && interactionResult.Contact.Id.HasValue && interactionResult.Id.HasValue) {
+			if (interactionResult != null && interactionResult.Contact != null && interactionResult.Contact.Id.HasValue && interactionResult.Id.HasValue)
+			{
 				var triggeredGoal = await interactionManager.GetInteraction(cfg, interactionResult.Contact.Id.Value, interactionResult.Id.Value);
 			}
 
@@ -128,14 +154,7 @@ namespace Sitecore.TechnicalMarketing.xConnectTutorial
 			 * TUTORIAL: Delete a single Contact from the database
 			 */
 			var deletedContact = await contactManager.DeleteContact(cfg, twitterId);
-
-
-			/**
-			 * TUTORIAL: Create a batch of Contacts with old interactions, then find all contacts with no interactions since the configured search period. Then delete these inactive Contacts!
-			 */
-			await DeletingMultipleContactsTutorial(cfg);
 		}
-
 
 		/// <summary>
 		/// Create a batch of Contacts with old interactions, then find all contacts with no interactions since the configured search period. Then delete these inactive Contacts!
