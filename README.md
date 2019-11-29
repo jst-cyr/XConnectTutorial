@@ -1,7 +1,7 @@
 # XConnectTutorial
 A tutorial repository based on the Sitecore documentation to walk users through common interactions with the xConnect APIs.
 
-Based on code from @Martina Wehlander in the "Getting Started" tutorials and other great documentation: https://doc.sitecore.net/developers/xp/getting-started/#tutorials-xconnect
+Based on code from Martina Welander in the "Getting Started" tutorials and other great documentation: https://doc.sitecore.net/developers/xp/getting-started/#tutorials-xconnect
 
 ## Version support
 **Latest version:** Sitecore XP 9.2.0
@@ -9,7 +9,9 @@ Based on code from @Martina Wehlander in the "Getting Started" tutorials and oth
 
 
 ## Getting Started
-**Program.cs** kicks off the console program and delegates to many other classes which contain the examples of how to interact with the APIs.
+**Program.cs** kicks off the console program and delegates to many other classes which contain the examples of how to interact with the APIs. 
+
+IMPORTANT: For 'easy mode', run Visual Studio in administrator mode, otherwise you are likely to have issues accessing your certificates.
 
 Modify the following configuration values in the app.config file:
 
