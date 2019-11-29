@@ -1,7 +1,7 @@
 # XConnectTutorial
 A tutorial repository based on the Sitecore documentation to walk users through common interactions with the xConnect APIs.
 
-Based on code from @Martina Wehlander in the "Getting Started" tutorials and other great documentation: https://doc.sitecore.net/developers/xp/getting-started/#tutorials-xconnect
+Based on code from Martina Welander in the "Getting Started" tutorials and other great documentation: https://doc.sitecore.net/developers/xp/getting-started/#tutorials-xconnect
 
 ## Version support
 **Latest version:** Sitecore XP 9.2.0
@@ -9,7 +9,9 @@ Based on code from @Martina Wehlander in the "Getting Started" tutorials and oth
 
 
 ## Getting Started
-**Program.cs** kicks off the console program and delegates to many other classes which contain the examples of how to interact with the APIs.
+**Program.cs** kicks off the console program and delegates to many other classes which contain the examples of how to interact with the APIs. 
+
+IMPORTANT: For 'easy mode', run Visual Studio in administrator mode, otherwise you are likely to have issues accessing your certificates.
 
 Modify the following configuration values in the app.config file:
 
@@ -33,3 +35,4 @@ From here you can start the console app from within Visual Studio and you should
 7. **Search Interactions**: Instead of loading a contact, this searches the interactions collection and finds all interactions within the configured search date span.
 8. **Expanding an interaction search result**: In this example, we show taking a search result and then querying xConnect to get the full details of the registered goal based on the information on the search result.
 9. **Delete a single Contact**: Showcasing the Delete API introduced in 9.2, this sample deletes our new Contact and all the interactions created so far.
+10. **Deleting multiple inactive Contacts**: This is the most 'complex' of the tutorials here with multiple stages. This will show creating a new batch of Contacts, then finding all the contacts with no interactions since a given date, then deleting all those inactive Contacts from the database.
