@@ -4,8 +4,9 @@ A tutorial repository based on the Sitecore documentation to walk users through 
 Based on code from Martina Welander in the "Getting Started" tutorials and other great documentation: https://doc.sitecore.net/developers/xp/getting-started/#tutorials-xconnect
 
 ## Version support
-**Latest version:** Sitecore XP 9.2.0
-**Available releases:** v9.0.2
+**Latest version:** Sitecore XP 9.3.0
+
+**Available releases:** v9.0.2, v9.2.0
 
 
 ## Getting Started
