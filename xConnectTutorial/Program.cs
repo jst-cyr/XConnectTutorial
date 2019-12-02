@@ -60,6 +60,8 @@ namespace Sitecore.TechnicalMarketing.xConnectTutorial
 			 * TUTORIAL: Create a batch of Contacts with old interactions, then find all contacts with no interactions since the configured search period. Then delete these inactive Contacts!
 			 */
 			await DeletingMultipleContactsTutorial(cfg);
+
+			return;
 		}
 
 
@@ -107,14 +109,12 @@ namespace Sitecore.TechnicalMarketing.xConnectTutorial
 			var contactUpdater = new UpdateContactTutorial() { Logger = outputHandler };
 			var updatedContact = await contactUpdater.UpdateContact(cfg, twitterId, updatedPersonalInformation);
 
-
 			/**
 			 * TUTORIAL: Register a goal for the created contact
 			 */
 			//Initialize IP information which will be used for tracking events.
 			var ipInfo = new IpInfo("127.0.0.1") { BusinessName = "Home" };
 			var interaction = await interactionManager.RegisterGoalInteraction(cfg, contact, configuration.OtherEventChannelId, configuration.InstantDemoGoalId, ipInfo);
-
 
 			/**
 			 * TUTORIAL: Reference Data Manager
